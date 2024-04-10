@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="channel">频道</string>
+    <string name="server">服务器</string>
+    <string name="settings">设置</string>
+    <string name="add_server">添加服务器</string>
+    <string name="hostname">主机名</string>
+    <string name="password">密码</string>
+    <string name="nickname">昵称</string>
+    <string name="cancel">取消</string>
+    <string name="add">添加</string>
+</resources>
