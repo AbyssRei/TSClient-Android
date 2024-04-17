@@ -1,17 +1,17 @@
 package site.sayaz.ts3client.ui.channel
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import com.github.manevolent.ts3j.api.Channel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import site.sayaz.ts3client.client.ClientSocket
-import site.sayaz.ts3client.ui.AppViewModel
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun ChannelList(channelList: List<String>){
-    channelList.forEach {
+fun ChannelList(channels: List<ChannelData>){
+    channels.forEach {
         ChannelItem(it)
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 

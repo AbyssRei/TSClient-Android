@@ -68,14 +68,14 @@ class AppViewModel @Inject constructor(
                     // uiState update
                     Log.d("AppViewModel", "connectServer: getting channel list")
 
-                    val channelList = socket.client.listChannels()
-                    val channelData = ChannelData(
-                        channelList.map { it.name }
-                    )
-                    //Log.d(TAG, "${socket.client.getChannelList().map { it.name }}")
-                    _uiState.update {
-                        it.copy(channels = it.channels + channelData)
-                    }
+//                    val channelList = socket.client.listChannels()
+//                    val channelData = ChannelData(
+//                        channelList.map { it.name }
+//                    )
+//                    //Log.d(TAG, "${socket.client.getChannelList().map { it.name }}")
+//                    _uiState.update {
+//                        it.copy(channels = it.channels + channelData)
+//                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
