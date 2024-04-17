@@ -1,55 +1,37 @@
 package site.sayaz.ts3client.ui.main
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import android.util.Log
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import site.sayaz.ts3client.ui.AppViewModel
-import site.sayaz.ts3client.ui.channel.ChannelLayout
-import site.sayaz.ts3client.ui.navigation.BottomNav
-import site.sayaz.ts3client.ui.navigation.NavItem
-import site.sayaz.ts3client.ui.navigation.TopNav
-import site.sayaz.ts3client.ui.server.ServerLayout
-import site.sayaz.ts3client.ui.settings.SettingsLayout
+import site.sayaz.ts3client.ui.navigation.MainRoute
+import site.sayaz.ts3client.ui.server.AddServerScreen
 
 @Composable
 fun MainScreen(
-    navController: NavHostController){
-    val appViewModel : AppViewModel = viewModel()
-    val navItems = NavItem.getItems()
-    val topBarTitleID = remember { mutableIntStateOf(navItems[0].titleID) }
-    val topBarActions = remember { mutableStateOf(navItems[0].actions) }
-    Scaffold(
-        topBar = { TopNav(title = stringResource(id = topBarTitleID.intValue), actions = topBarActions.value) },
-        bottomBar = { BottomNav(navController = navController, title = topBarTitleID, actions = topBarActions) }
-    ) { paddingValues ->
-        NavHost(navController = navController, startDestination = navItems[0].route){
-            composable(navItems[0].route){
-                Box(modifier = Modifier.padding(paddingValues)){
-                    ServerLayout(appViewModel)
-                }
-            }
-            composable(navItems[1].route){
-                Box(modifier = Modifier.padding(paddingValues)){
-                    ChannelLayout(appViewModel)
-                }
-            }
-            composable(navItems[2].route){
-                Box(modifier = Modifier.padding(paddingValues)){
-                    SettingsLayout()
-                }
-            }
+    appViewModel : AppViewModel
+){
+    val mainNavController = rememberNavController()
+    NavHost(navController = mainNavController, startDestination = MainRoute.MAIN.name,
+        enterTransition = { slideInHorizontally(animationSpec = tween(300), initialOffsetX = {it/2}) + fadeIn(animationSpec = tween(195)) },
+        exitTransition = { slideOutHorizontally(animationSpec = tween(300), targetOffsetX = {it/2}) + fadeOut(animationSpec = tween(195))}
+        ){
+        composable(MainRoute.MAIN.name,
+            enterTransition = { slideInHorizontally(animationSpec = tween(300), initialOffsetX = {-it/2}) + fadeIn(animationSpec = tween(195))},
+            exitTransition = { slideOutHorizontally(animationSpec = tween(300), targetOffsetX = {-it/2}) + fadeOut(animationSpec = tween(195))}
+            ){
+            MainScaffold(mainNavController,appViewModel)
+        }
+        composable(MainRoute.ADD_SERVER.name){
+            Log.d("MainScreen",MainRoute.ADD_SERVER.name)
+            AddServerScreen(mainNavController,appViewModel)
         }
     }
 }

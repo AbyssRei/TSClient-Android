@@ -26,8 +26,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController()
-                    MainScreen(navController)
+                    MainScreen(viewModel())
                 }
             }
         }

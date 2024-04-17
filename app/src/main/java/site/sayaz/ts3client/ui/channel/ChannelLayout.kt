@@ -23,14 +23,14 @@ fun ChannelLayout(appViewModel : AppViewModel = viewModel()){
     Column {
         PrimaryTabRow(selectedTabIndex = i) {
             channels.forEachIndexed { index, channel ->
-                Tab(
-                    selected = i == index,
-                    onClick = { i = index },
-                    text = { Text(channel.serverName) }
-                )
+
             }
         }
-        val channelList = channels[i].channelName
-        ChannelList(channelList)
+
+        if (channels.isNotEmpty()) {
+            ChannelList(channels[i].channelName)
+        }else{
+
+        }
     }
 }

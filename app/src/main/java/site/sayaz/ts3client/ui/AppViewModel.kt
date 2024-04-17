@@ -1,10 +1,15 @@
 package site.sayaz.ts3client.ui
 
+import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.manevolent.ts3j.api.Permission
+import com.github.manevolent.ts3j.event.ChannelSubscribedEvent
+import com.github.manevolent.ts3j.event.TS3Listener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +21,6 @@ import site.sayaz.ts3client.client.IdentityDataDao
 import site.sayaz.ts3client.ui.channel.ChannelData
 import site.sayaz.ts3client.ui.server.LoginData
 import site.sayaz.ts3client.ui.server.LoginDataDao
-import site.sayaz.ts3client.util.getChannelList
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,7 +30,7 @@ class AppViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AppState())
     val uiState: StateFlow<AppState> = _uiState.asStateFlow()
-    private lateinit var clientSockets : MutableMap<String, ClientSocket>
+    private lateinit var clientSockets : ClientSocket
 
     init {
         Log.d("AppViewModel", "init! ")
@@ -48,27 +52,33 @@ class AppViewModel @Inject constructor(
 
     fun connectServer(server: LoginData) {
         val socket = ClientSocket(loginData = server, identityDataDao = identityDataDao)
+        val ts3Listener = object : TS3Listener{
+            override fun onChannelSubscribed(e: ChannelSubscribedEvent?) {
+                super.onChannelSubscribed(e)
 
+            }
+        }
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    socket.connect()
-
+                    socket.connect(ts3Listener)
                     // Connection successful
-                    clientSockets[server.hostname] = socket
-
+                    clientSockets = socket
+                    delay(2000)
                     // uiState update
+                    Log.d("AppViewModel", "connectServer: getting channel list")
+
+                    val channelList = socket.client.listChannels()
                     val channelData = ChannelData(
-                        server.hostname,
-                        socket.client.getChannelList().map { it.name }
+                        channelList.map { it.name }
                     )
+                    //Log.d(TAG, "${socket.client.getChannelList().map { it.name }}")
                     _uiState.update {
                         it.copy(channels = it.channels + channelData)
                     }
-
                 }
             } catch (e: Exception) {
-                Log.d("ServerViewModel", "connectServer: ${e.message}")
+                e.printStackTrace()
             }
         }
     }
@@ -77,12 +87,8 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 // Close all clients
-                if(clientSockets.isNotEmpty()){
-                    clientSockets.forEach { (hostname, socket) ->
-                        Log.d("AppViewModel", "disconnectAll: Disconnecting $hostname")
-                        socket.client.disconnect("Bye~")
-                        socket.client.close()
-                    }
+                if (this@AppViewModel::clientSockets.isInitialized){
+                    clientSockets.client.disconnect()
                 }
             }
             _uiState.update { it.copy(
@@ -90,6 +96,8 @@ class AppViewModel @Inject constructor(
             ) }
         }
     }
+
+
 
 
 }

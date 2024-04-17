@@ -1,4 +1,4 @@
-package site.sayaz.ts3client.hilt.di
+package site.sayaz.ts3client.di
 
 import android.content.Context
 import androidx.room.Room

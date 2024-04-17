@@ -2,6 +2,7 @@ package site.sayaz.ts3client.client
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import com.github.manevolent.ts3j.api.Channel
 import com.github.manevolent.ts3j.event.TS3Listener
 import com.github.manevolent.ts3j.identity.LocalIdentity
 import com.github.manevolent.ts3j.protocol.socket.client.LocalTeamspeakClientSocket
@@ -22,9 +23,9 @@ class ClientSocket(val loginData: LoginData, val identityDataDao: IdentityDataDa
 
 
     @Throws(TimeoutException::class)
-    suspend fun connect(): LocalTeamspeakClientSocket {
+    suspend fun connect(ts3Listener: TS3Listener): LocalTeamspeakClientSocket {
         // Set up _client
-        val listener: TS3Listener = object : TS3Listener {}
+        val listener: TS3Listener = ts3Listener
         val identity: LocalIdentity = getIdentity()
 
         _client.setIdentity(identity)
@@ -35,10 +36,13 @@ class ClientSocket(val loginData: LoginData, val identityDataDao: IdentityDataDa
             base64Sha1(loginData.password),
             10000L
         )
+        _client.subscribeAll()
         Log.d("ClientSocket", "Connected to ${loginData.hostname}")
 
         return _client
     }
+
+
 
     private suspend fun getIdentity(): LocalIdentity {
         val identityData = identityDataDao.getIdentity()

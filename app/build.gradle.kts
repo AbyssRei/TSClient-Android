@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.animation)
     // implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
@@ -77,6 +78,8 @@ dependencies {
     //hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    // XXPermissions
+    implementation("com.github.getActivity:XXPermissions:18.63")
 
     implementation(files("src/main/java/site/sayaz/ts3client/lib/ts3j.jar"))
     implementation(files("src/main/java/site/sayaz/ts3client/lib/bcprov-jdk15on-1.60.jar"))
