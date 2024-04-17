@@ -38,8 +38,12 @@ class ClientSocket(val loginData: LoginData, val identityDataDao: IdentityDataDa
         )
         _client.subscribeAll()
         Log.d("ClientSocket", "Connected to ${loginData.hostname}")
-
         return _client
+    }
+
+    @Throws(Exception::class)
+    fun switchChannel(channelID: Int,password: String = ""){
+        _client.joinChannel(channelID,password)
     }
 
 

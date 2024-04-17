@@ -9,4 +9,6 @@
     <string name="nickname">Nickname</string>
     <string name="cancel">Cancel</string>
     <string name="add">Add</string>
+    <string name="insufficient_client_permissions">Insufficient client permissions</string>
+    <string name="connection_timeout">Connection timeout</string>
 </resources>

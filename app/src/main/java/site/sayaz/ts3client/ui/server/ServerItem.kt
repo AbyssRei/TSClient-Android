@@ -37,10 +37,10 @@ fun ServerItem(loginData: LoginData,appViewModel: AppViewModel = viewModel()) {
             }
         },
         leadingContent = {
-            Icon(
-                Icons.Default.Info,
-                contentDescription = "loginData Icon",
-            )
+//            Icon(
+//                Icons.Default.Info,
+//                contentDescription = "loginData Icon",
+//            )
         }
     )
     Spacer(modifier = Modifier.height(8.dp))

@@ -19,9 +19,9 @@ fun ChannelLayout(appViewModel : AppViewModel = viewModel()){
     val channels = appState.channels
     Column {
         if (channels.isNotEmpty()) {
-            ChannelList(channels)
+            ChannelList(channels, appViewModel::switchChannel)
         }else{
-        //TODO
+        //TODO 空白页面
         }
     }
 }

@@ -9,4 +9,6 @@
     <string name="nickname">昵称</string>
     <string name="cancel">取消</string>
     <string name="add">添加</string>
+    <string name="insufficient_client_permissions">权限不足</string>
+    <string name="connection_timeout">连接超时</string>
 </resources>

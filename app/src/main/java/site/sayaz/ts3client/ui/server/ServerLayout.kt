@@ -40,10 +40,6 @@ fun ServerLayout(appViewModel : AppViewModel = viewModel(),mainNavController: Na
                 ServerItem(loginData = server,appViewModel = appViewModel)
             }
         }
-        FloatingActionButton(onClick = { mainNavController.navigate(MainRoute.ADD_SERVER.name) },
-            modifier = Modifier.align(androidx.compose.ui.Alignment.BottomEnd).padding(16.dp)){
-            Icon(Icons.Filled.Add, contentDescription = "add Server")
-        }
     }
 }
 

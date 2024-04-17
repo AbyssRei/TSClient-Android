@@ -11,5 +11,6 @@ import site.sayaz.ts3client.ui.server.LoginData
  */
 data class AppState(
     val channels : List<ChannelData> = emptyList(),
-    val servers: List<LoginData> = emptyList()
+    val servers: List<LoginData> = emptyList(),
+    val errorMessage : String = "",
 )

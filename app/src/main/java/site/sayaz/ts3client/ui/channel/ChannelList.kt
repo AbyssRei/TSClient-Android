@@ -8,9 +8,9 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun ChannelList(channels: List<ChannelData>){
+fun ChannelList(channels: List<ChannelData>, switchChannel: (Int) -> Unit){
     channels.forEach {
-        ChannelItem(it)
+        ChannelItem(it, switchChannel)
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
