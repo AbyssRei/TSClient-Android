@@ -12,4 +12,5 @@
     <string name="insufficient_client_permissions">Insufficient client permissions</string>
     <string name="connection_timeout">Connection timeout</string>
     <string name="password_supporting_text">If there is no password, please leave it blank</string>
+    <string name="permantely_permission_denied">Permission is denied. Please open it manually in the Settings page</string>
 </resources>

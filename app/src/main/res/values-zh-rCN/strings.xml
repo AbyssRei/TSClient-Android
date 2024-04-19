@@ -12,4 +12,5 @@
     <string name="insufficient_client_permissions">权限不足</string>
     <string name="connection_timeout">连接超时</string>
     <string name="password_supporting_text">若无密码请留空</string>
+    <string name="permantely_permission_denied">权限被拒绝，请手动授权</string>
 </resources>
