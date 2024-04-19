@@ -11,4 +11,5 @@
     <string name="add">Add</string>
     <string name="insufficient_client_permissions">Insufficient client permissions</string>
     <string name="connection_timeout">Connection timeout</string>
+    <string name="password_supporting_text">If there is no password, please leave it blank</string>
 </resources>
