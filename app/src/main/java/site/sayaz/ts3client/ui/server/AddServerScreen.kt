@@ -1,12 +1,14 @@
 package site.sayaz.ts3client.ui.server
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -30,8 +32,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -64,12 +72,16 @@ fun AddServerScreen(navController: NavController, appViewModel: AppViewModel) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddServerContent(
     paddingValues: PaddingValues,
     navController: NavController,
     appViewModel: AppViewModel
 ) {
+    val focusManager = LocalFocusManager.current
+    val (requester1, requester2, requester3) = remember { FocusRequester.createRefs() }
+
     val labels = listOf(R.string.hostname, R.string.password, R.string.nickname)
     val textFields = remember { mutableStateListOf<TextFieldValue>() }
 
@@ -97,11 +109,20 @@ fun AddServerContent(
                 value = textFields[0],
                 onValueChange = {
                     textFields[0] = it
-                    validateServer(it.text)
                 },
                 label = { Text(stringResource(id = R.string.hostname)) },
                 maxLines = 1,
-                isError = serverTextIsErr
+                isError = serverTextIsErr,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        Log.d("AddServerScreen", "onNext")
+                        validateServer(textFields[0].text)
+                        if(!serverTextIsErr){
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    }),
+
             )
             Spacer(modifier = Modifier.padding(8.dp))
             OutlinedTextField(
@@ -111,7 +132,12 @@ fun AddServerContent(
                 maxLines = 1,
                 visualTransformation =
                 if (passwordHidden) PasswordVisualTransformation() else VisualTransformation.None,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                ),
                 trailingIcon = {
                     IconButton(onClick = { passwordHidden = !passwordHidden }) {
                         val visibilityIcon =
@@ -124,33 +150,34 @@ fun AddServerContent(
                     Text(
                         text = stringResource(id = R.string.password_supporting_text)
                     )
-                }
+                },
+                modifier = Modifier.focusRequester(requester2),
             )
             Spacer(modifier = Modifier.padding(8.dp))
             OutlinedTextField(
                 value = textFields[2],
                 onValueChange = {
                     textFields[2] = it
-                    validateNickname(it.text)
                 },
                 label = { Text(stringResource(id = R.string.nickname)) },
                 maxLines = 1,
-                isError = nicknameTextIsErr
+                isError = nicknameTextIsErr,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        validateNickname(textFields[2].text)
+                        if(!nicknameTextIsErr){
+                            onDone(appViewModel, navController, textFields)
+                        }
+                    }
+                ),
+                modifier = Modifier.focusRequester(requester3),
             )
 
             Row {
-
                 TextButton(onClick = {
                     if (serverTextIsErr or nicknameTextIsErr) return@TextButton
-                    appViewModel.insertServer(
-                        LoginData(
-                            0,
-                            textFields[0].text,
-                            textFields[1].text,
-                            textFields[2].text
-                        )
-                    )
-                    navController.popBackStack()
+                    onDone(appViewModel, navController, textFields)
                 }
                 ) {
                     Text(stringResource(id = R.string.add))
@@ -158,4 +185,16 @@ fun AddServerContent(
             }
         }
     }
+}
+private fun onDone(appViewModel: AppViewModel, navController: NavController, textFields: List<TextFieldValue>) {
+    appViewModel.insertServer(
+        LoginData(
+            0,
+            textFields[0].text,
+            textFields[1].text,
+            textFields[2].text
+        )
+    )
+    navController.popBackStack()
+
 }
