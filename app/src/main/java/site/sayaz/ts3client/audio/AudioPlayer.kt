@@ -1,0 +1,58 @@
+package site.sayaz.ts3client.audio
+
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioManager
+import android.media.AudioTrack
+import android.util.Log
+import com.github.manevolent.ts3j.protocol.packet.PacketBody0Voice
+
+class AudioPlayer {
+    private var audioTrack: AudioTrack
+    private var isPlaying = false
+    private val audioDecoder = AudioDecoder(48000, 1)
+
+    init {
+        val minBufferSize = AudioTrack.getMinBufferSize(
+            48000,
+            AudioFormat.CHANNEL_OUT_MONO,
+            AudioFormat.ENCODING_PCM_16BIT
+        )
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
+        val audioFormat = AudioFormat.Builder()
+            .setSampleRate(48000)
+            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+            .build()
+        audioTrack = AudioTrack(
+            audioAttributes,
+            audioFormat,
+            minBufferSize,
+            AudioTrack.MODE_STREAM,
+            AudioManager.AUDIO_SESSION_ID_GENERATE
+        )
+    }
+
+    fun playPacket(voicePacket: PacketBody0Voice) {
+        audioTrack.play()
+        isPlaying = true
+
+        val audioData = voicePacket.codecData
+        if (audioData == null) {
+            Log.d("AudioPlayer", "No audio data")
+            return
+        }
+
+        audioDecoder.decode(audioData) {
+            audioTrack.write(it, 0, it.size)
+        }
+    }
+
+    fun stop() {
+        audioTrack.stop()
+        audioTrack.release()
+    }
+}

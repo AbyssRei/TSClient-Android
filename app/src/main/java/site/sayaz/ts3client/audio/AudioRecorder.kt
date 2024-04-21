@@ -30,6 +30,7 @@ class AudioRecorder(val context: Context,private val audioInput: AudioInput) {
                     Manifest.permission.RECORD_AUDIO
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
+                //TODO
                 toast(context, "Please grant audio permission")
                 XXPermissions.startPermissionActivity(context)
                 return
@@ -46,7 +47,7 @@ class AudioRecorder(val context: Context,private val audioInput: AudioInput) {
                     val readSize = audioRecord.read(buffer, 0, bufferSize)
                     if (readSize > 0) {
                         val audioData = buffer.copyOfRange(0, readSize)
-                        Log.d("AudioRecorder", "Audio data size: ${audioData.size}")
+                        //Log.d("AudioRecorder", "Audio data size: ${audioData.size}")
                         audioInput.write(audioData)
 
                     }

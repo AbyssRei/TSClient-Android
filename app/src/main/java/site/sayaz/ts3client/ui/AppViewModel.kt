@@ -1,10 +1,8 @@
 package site.sayaz.ts3client.ui
 
 import android.app.Application
-import android.media.MediaRecorder
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.manevolent.ts3j.event.TS3Listener
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -85,7 +83,7 @@ class AppViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                sendErrorMessage(e.message)
+                showErrorMessage(e.message)
                 e.printStackTrace()
             }
         }
@@ -99,7 +97,7 @@ class AppViewModel @Inject constructor(
                     clientSockets.switchChannel(channelID)
                 } catch (e: Exception) {
                     Log.i("AppViewModel", "Failed to switch channel:${e.message}")
-                    sendErrorMessage(e.message)
+                    showErrorMessage(e.message)
                 }
             }
         }
@@ -123,7 +121,7 @@ class AppViewModel @Inject constructor(
             }
         }
     }
-    private fun sendErrorMessage(message: String?) {
+    private fun showErrorMessage(message: String?) {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
