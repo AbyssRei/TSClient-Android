@@ -31,13 +31,13 @@ import site.sayaz.ts3client.ui.navigation.MainRoute
 
 
 @Composable
-fun ServerLayout(appViewModel : AppViewModel = viewModel(),mainNavController: NavController) {
+fun ServerLayout(appViewModel : AppViewModel = viewModel()) {
     val appState by appViewModel.uiState.collectAsState()
     val scrollState = rememberLazyListState()
     Box(Modifier.fillMaxSize()) {
         LazyColumn(state = scrollState) {
             items(appState.servers) { server ->
-                ServerItem(loginData = server,appViewModel = appViewModel)
+                ServerItem(loginData = server, connectServer = appViewModel::connectServer)
             }
         }
     }

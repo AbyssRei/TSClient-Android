@@ -99,7 +99,7 @@ fun MainScaffold(mainNavController: NavController, appViewModel: AppViewModel = 
                         .padding(paddingValues)
                         .fillMaxSize()
                 ) {
-                    ServerLayout(appViewModel, mainNavController)
+                    ServerLayout(appViewModel = appViewModel)
                 }
             }
             composable(ScaRoute.CHANNEL.name) {

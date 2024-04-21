@@ -28,6 +28,8 @@ fun ErrorNotifier(appViewModel: AppViewModel, snackbarHostState: SnackbarHostSta
         stringResource(id = R.string.insufficient_client_permissions)
     val connectionTimeOut =
         stringResource(id = R.string.connection_timeout)
+    val channelMaxClientReached =
+        stringResource(id = R.string.channel_max_client_reached)
 
     scope.launch {
         when (errorMessage) {
@@ -39,6 +41,11 @@ fun ErrorNotifier(appViewModel: AppViewModel, snackbarHostState: SnackbarHostSta
             "timeout waiting for CONNECTED state" -> {
                 snackbarHostState.showSnackbar(
                     message = connectionTimeOut,
+                )
+            }
+            "channel maxclient reached" -> {
+                snackbarHostState.showSnackbar(
+                    message = channelMaxClientReached,
                 )
             }
         }

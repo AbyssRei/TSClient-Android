@@ -1,17 +1,23 @@
 package site.sayaz.ts3client.ui
 
+import android.app.Application
+import android.media.MediaRecorder
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.manevolent.ts3j.event.TS3Listener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import site.sayaz.ts3client.audio.AudioInput
+import site.sayaz.ts3client.audio.AudioRecorder
 import site.sayaz.ts3client.client.ClientSocket
 import site.sayaz.ts3client.client.IdentityDataDao
 import site.sayaz.ts3client.ui.channel.ChannelData
@@ -22,11 +28,15 @@ import javax.inject.Inject
 @HiltViewModel
 class AppViewModel @Inject constructor(
     val identityDataDao: IdentityDataDao,
-    val loginDataDao: LoginDataDao
-) : ViewModel() {
+    val loginDataDao: LoginDataDao,
+    application : Application
+) : AndroidViewModel(application) {
+
     private val _uiState = MutableStateFlow(AppState())
     val uiState: StateFlow<AppState> = _uiState.asStateFlow()
     private lateinit var clientSockets: ClientSocket
+    private val audioRecorder =
+        AudioRecorder(getApplication(), AudioInput())
 
     init {
         Log.d("AppViewModel", "init viewmodel")
@@ -52,7 +62,7 @@ class AppViewModel @Inject constructor(
      * @throws Exception
      */
     fun connectServer(server: LoginData) {
-        val socket = ClientSocket(loginData = server, identityDataDao = identityDataDao)
+        val socket = ClientSocket(server, identityDataDao, audioRecorder)
         val ts3Listener = object : TS3Listener {}
         viewModelScope.launch {
             try {
@@ -75,15 +85,12 @@ class AppViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        errorMessage = e.message ?: ""
-                    )
-                }
+                sendErrorMessage(e.message)
                 e.printStackTrace()
             }
         }
     }
+
 
     fun switchChannel(channelID: Int) {
         viewModelScope.launch {
@@ -92,11 +99,7 @@ class AppViewModel @Inject constructor(
                     clientSockets.switchChannel(channelID)
                 } catch (e: Exception) {
                     Log.i("AppViewModel", "Failed to switch channel:${e.message}")
-                    _uiState.update {
-                        it.copy(
-                            errorMessage = e.message ?: ""
-                        )
-                    }
+                    sendErrorMessage(e.message)
                 }
             }
         }
@@ -109,14 +112,28 @@ class AppViewModel @Inject constructor(
     fun disconnect() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                // Close all clients
                 if (this@AppViewModel::clientSockets.isInitialized) {
-                    clientSockets.client.disconnect()
+                    clientSockets.disconnect()
                 }
             }
             _uiState.update {
                 it.copy(
                     channels = emptyList()
+                )
+            }
+        }
+    }
+    private fun sendErrorMessage(message: String?) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    errorMessage = message?:""
+                )
+            }
+            delay(1000)
+            _uiState.update {
+                it.copy(
+                    errorMessage = ""
                 )
             }
         }

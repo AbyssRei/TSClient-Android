@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "site.sayaz.ts3client"
-        minSdk = 29
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -72,6 +72,8 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.constraintlayout.compose)
+    implementation(libs.androidx.material.icons.extended)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.lifecycle.viewmodel.compose)

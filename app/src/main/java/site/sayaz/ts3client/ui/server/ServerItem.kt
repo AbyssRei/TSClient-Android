@@ -27,12 +27,12 @@ import site.sayaz.ts3client.ui.AppViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ServerItem(loginData: LoginData,appViewModel: AppViewModel = viewModel()) {
+fun ServerItem(loginData: LoginData,connectServer : (LoginData) -> Unit) {
     ListItem(
         headlineContent = { Text(loginData.hostname) },
         supportingContent = { Text(loginData.nickname) },
         trailingContent = {
-            IconButton(onClick = { appViewModel.connectServer(loginData) }) {
+            IconButton(onClick = { connectServer(loginData) }) {
                 Icon(Icons.Default.PlayArrow, contentDescription = "enter")
             }
         },
