@@ -19,8 +19,8 @@ import site.sayaz.ts3client.audio.AudioRecorder
 import site.sayaz.ts3client.client.ClientSocket
 import site.sayaz.ts3client.client.IdentityDataDao
 import site.sayaz.ts3client.ui.channel.ChannelData
-import site.sayaz.ts3client.ui.server.LoginData
-import site.sayaz.ts3client.ui.server.LoginDataDao
+import site.sayaz.ts3client.client.LoginData
+import site.sayaz.ts3client.client.LoginDataDao
 import javax.inject.Inject
 
 @HiltViewModel

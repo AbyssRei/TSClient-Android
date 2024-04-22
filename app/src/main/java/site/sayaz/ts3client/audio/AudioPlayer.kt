@@ -36,19 +36,21 @@ class AudioPlayer {
         )
     }
 
-    fun playPacket(voicePacket: PacketBody0Voice) {
+    fun start() {
         audioTrack.play()
         isPlaying = true
+    }
 
-        val audioData = voicePacket.codecData
-        if (audioData == null) {
-            Log.d("AudioPlayer", "No audio data")
-            return
-        }
+    fun playPacket(voicePacket: PacketBody0Voice) {
+            var audioData = voicePacket.codecData
+            if (audioData == null) {
+                Log.d("AudioPlayer", "No audio data")
+                audioData = ByteArray(0)
+            }
 
-        audioDecoder.decode(audioData) {
-            audioTrack.write(it, 0, it.size)
-        }
+            audioDecoder.decode(audioData) {
+                audioTrack.write(it, 0, it.size)
+            }
     }
 
     fun stop() {

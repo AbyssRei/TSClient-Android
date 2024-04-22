@@ -1,4 +1,4 @@
-package site.sayaz.ts3client.ui.server
+package site.sayaz.ts3client.client
 
 import androidx.room.Dao
 import androidx.room.Entity

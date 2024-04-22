@@ -13,15 +13,15 @@ class AudioDecoder (private val sampleRate: Int, private val channelCount: Int){
     private var presentationTimeUs: Long = 0
 
     init {
-        val format = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_OPUS, sampleRate, channelCount)
+        val format = MediaFormat.createAudioFormat(MediaFormat.MIMETYPE_AUDIO_OPUS, sampleRate, 1)
         format.setInteger(MediaFormat.KEY_BIT_RATE, 64000)
         val csd0bytes = byteArrayOf(
             0x4f, 0x70, 0x75, 0x73,  // Opus
             0x48, 0x65, 0x61, 0x64,  // Head
             0x01, // Version
-            0x02,   // Channel Count
+            0x01,   // Channel Count
             0x00, 0x00, // Pre skip
-            0x00.toByte(), 0xfa.toByte(), 0x00, 0x00,// Input Sample Rate (Hz), eg: 48000
+            0x00.toByte(), 0xfa.toByte(), 0x00, 0x00,// Input Sample Rate (Hz),64000
             0x00, 0x00,  // Output Gain (Q7.8 in dB)
             0x00// Mapping Family
         )

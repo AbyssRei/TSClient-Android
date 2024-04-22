@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import site.sayaz.ts3client.R
+import site.sayaz.ts3client.client.LoginData
 import site.sayaz.ts3client.ui.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

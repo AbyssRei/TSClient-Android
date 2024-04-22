@@ -1,7 +1,7 @@
 package site.sayaz.ts3client.ui
 
 import site.sayaz.ts3client.ui.channel.ChannelData
-import site.sayaz.ts3client.ui.server.LoginData
+import site.sayaz.ts3client.client.LoginData
 
 /**
  * AppState

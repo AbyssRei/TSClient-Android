@@ -2,17 +2,16 @@ package site.sayaz.ts3client.client
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import com.github.manevolent.ts3j.api.Channel
 import com.github.manevolent.ts3j.event.TS3Listener
 import com.github.manevolent.ts3j.identity.LocalIdentity
 import com.github.manevolent.ts3j.protocol.socket.client.LocalTeamspeakClientSocket
 import site.sayaz.ts3client.audio.AudioPlayer
 import site.sayaz.ts3client.audio.AudioRecorder
-import site.sayaz.ts3client.ui.server.LoginData
 import site.sayaz.ts3client.util.base64Sha1
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeoutException
-import java.util.function.Consumer
 
 
 class ClientSocket(
@@ -22,11 +21,12 @@ class ClientSocket(
 ) {
 
 
+
     private val _client = LocalTeamspeakClientSocket()
     val client: LocalTeamspeakClientSocket
         get() = _client
 
-    @Throws(TimeoutException::class)
+    @Throws(Exception::class)
     suspend fun connect(ts3Listener: TS3Listener): LocalTeamspeakClientSocket {
         // Set up _client
         val listener: TS3Listener = ts3Listener
@@ -34,6 +34,7 @@ class ClientSocket(
         val audioPlayer = AudioPlayer()
         //audio
         audioRecorder.start()
+        audioPlayer.start()
 
         _client.setIdentity(identity)
         _client.addListener(listener)
@@ -73,6 +74,8 @@ class ClientSocket(
             newIdentity
         }
     }
+
+
 
     fun disconnect() {
         _client.disconnect()
