@@ -32,6 +32,8 @@ fun ErrorNotifier(appViewModel: AppViewModel, snackbarHostState: SnackbarHostSta
         stringResource(id = R.string.channel_max_client_reached)
     val tooManyClonesAlreadyConnected =
         stringResource(id = R.string.too_many_clones_already_connected)
+    val problemEstablishingClientConnection =
+        stringResource(id = R.string.problem_establishing_client_connection)
 
     scope.launch {
         when (errorMessage) {
@@ -40,22 +42,33 @@ fun ErrorNotifier(appViewModel: AppViewModel, snackbarHostState: SnackbarHostSta
                     message = insufficientClientPermissions,
                 )
             }
+
             "timeout waiting for CONNECTED state" -> {
                 snackbarHostState.showSnackbar(
                     message = connectionTimeOut,
                 )
             }
+
             "channel maxclient reached" -> {
                 snackbarHostState.showSnackbar(
                     message = channelMaxClientReached,
                 )
             }
+
             "too many clones already connected" -> {
                 snackbarHostState.showSnackbar(
                     message = tooManyClonesAlreadyConnected
                 )
             }
+
+            "Problem establishing client connection" -> {
+                snackbarHostState.showSnackbar(
+                    message = problemEstablishingClientConnection
+                )
+            }
+
+            else -> {}
         }
     }
-
 }
+

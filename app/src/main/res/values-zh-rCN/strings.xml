@@ -16,4 +16,5 @@
     <string name="permission_denied">权限被拒绝</string>
     <string name="channel_max_client_reached">频道达到最大人数</string>
     <string name="too_many_clones_already_connected">重复连接过多</string>
+    <string name="problem_establishing_client_connection">无法建立连接</string>
 </resources>

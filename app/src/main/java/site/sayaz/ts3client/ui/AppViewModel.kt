@@ -21,13 +21,15 @@ import site.sayaz.ts3client.client.IdentityDataDao
 import site.sayaz.ts3client.ui.channel.ChannelData
 import site.sayaz.ts3client.client.ServerData
 import site.sayaz.ts3client.client.ServerDataDao
+import site.sayaz.ts3client.ui.server.ConnectionState
+import site.sayaz.ts3client.ui.server.ServerConnectionState
 import javax.inject.Inject
 
 @HiltViewModel
 class AppViewModel @Inject constructor(
     val identityDataDao: IdentityDataDao,
     val serverDataDao: ServerDataDao,
-    application : Application
+    application: Application
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(AppState())
@@ -39,16 +41,32 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch {
             val serversFromDb = serverDataDao.getAll()
             if (serversFromDb.isNotEmpty()) {
-                _uiState.value = AppState(emptyList(), serversFromDb, "")
+                _uiState.value = AppState(
+                    servers = serversFromDb,
+                    serverConnectionStates =
+                    serversFromDb.map {
+                        ServerConnectionState(
+                            it.id,
+                            ConnectionState.NOT_CONNECTED
+                        )
+                    }
+                )
             }
         }
     }
 
 
-    fun insertServer(server: ServerData) {
+    fun addServer(server: ServerData) {
         _uiState.update {
             viewModelScope.launch { serverDataDao.insert(server) }
-            it.copy(servers = it.servers + server)
+            it.copy(
+                servers = it.servers + server,
+                serverConnectionStates =
+                it.serverConnectionStates + ServerConnectionState(
+                    server.id,
+                    ConnectionState.NOT_CONNECTED
+                )
+            )
         }
     }
 
@@ -63,40 +81,46 @@ class AppViewModel @Inject constructor(
         val ts3Listener = object : TS3Listener {}
         viewModelScope.launch {
             try {
+                lockInConnect(true)
                 withContext(Dispatchers.IO) {
+                    updateServerConnectionState(server.id, ConnectionState.CONNECTING)
                     socket.connect(ts3Listener)
                     // Connection successful
                     clientSockets = socket
                     onConnectSuccess(server)
-                    // uiState update
-                    // TODO 连接状态
-
                 }
             } catch (e: Exception) {
                 showErrorMessage(e.message)
+                updateServerConnectionState(server.id, ConnectionState.ERROR)
+                lockInConnect(false)
                 e.printStackTrace()
             }
         }
     }
 
     private fun onConnectSuccess(server: ServerData) {
-        viewModelScope.launch {try{
-            // get channel list
-            withContext(Dispatchers.IO) {
-                clientSockets.channelList.forEach { channel ->
-                    _uiState.update {
-                        it.copy(channels = it.channels + ChannelData(
-                            channelID = channel.id,
-                            channelName = channel.name,
-                            members = emptyList()
-                        ))
+        viewModelScope.launch {
+            try {
+                // get channel list
+                withContext(Dispatchers.IO) {
+                    clientSockets.channelList.forEach { channel ->
+                        _uiState.update {
+                            it.copy(
+                                channels = it.channels + ChannelData(
+                                    channelID = channel.id,
+                                    channelName = channel.name,
+                                    members = emptyList()
+                                )
+                            )
+                        }
                     }
                 }
+                updateServerConnectionState(server.id, ConnectionState.CONNECTED)
+            } catch (e: Exception) {
+                showErrorMessage(e.message)
+                e.printStackTrace()
             }
-        }catch (e: Exception){
-            showErrorMessage(e.message)
-            e.printStackTrace()
-        } }
+        }
     }
 
 
@@ -122,20 +146,18 @@ class AppViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 if (this@AppViewModel::clientSockets.isInitialized) {
                     clientSockets.disconnect()
+                    updateServerConnectionState(clientSockets.serverData.id, ConnectionState.NOT_CONNECTED)
+                    lockInConnect(false)
                 }
-            }
-            _uiState.update {
-                it.copy(
-                    channels = emptyList()
-                )
             }
         }
     }
+
     private fun showErrorMessage(message: String?) {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    errorMessage = message?:""
+                    errorMessage = message ?: ""
                 )
             }
             delay(1000)
@@ -144,6 +166,28 @@ class AppViewModel @Inject constructor(
                     errorMessage = ""
                 )
             }
+        }
+    }
+
+    private fun updateServerConnectionState(serverId: Int, connectionState: ConnectionState) {
+        _uiState.update {
+            it.copy(
+                serverConnectionStates = it.serverConnectionStates.map {
+                    if (it.serverId == serverId) {
+                        it.copy(connectionState = connectionState)
+                    } else {
+                        it
+                    }
+                }
+            )
+        }
+    }
+
+    private fun lockInConnect(value : Boolean) {
+        _uiState.update {
+            it.copy(
+                isInConnect = value
+            )
         }
     }
 }

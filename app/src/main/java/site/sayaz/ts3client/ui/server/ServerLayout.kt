@@ -21,7 +21,7 @@ fun ServerLayout(appViewModel : AppViewModel = viewModel()) {
     Box(Modifier.fillMaxSize()) {
         LazyColumn(state = scrollState) {
             items(appState.servers) { server ->
-                ServerItem(serverData = server, connectServer = appViewModel::connectServer)
+                ServerItem(serverData = server, appViewModel)
             }
         }
     }

@@ -183,7 +183,7 @@ fun AddServerContent(
     }
 }
 private fun onDone(appViewModel: AppViewModel, navController: NavController, textFields: List<TextFieldValue>) {
-    appViewModel.insertServer(
+    appViewModel.addServer(
         ServerData(
             0,
             textFields[0].text,

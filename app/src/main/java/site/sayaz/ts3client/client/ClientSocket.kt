@@ -17,7 +17,7 @@ import java.io.ByteArrayOutputStream
 
 
 class ClientSocket(
-    private val serverData: ServerData,
+    val serverData: ServerData,
     private val identityDataDao: IdentityDataDao,
     private val audioRecorder: AudioRecorder,
 ) {
