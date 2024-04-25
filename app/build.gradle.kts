@@ -83,6 +83,7 @@ dependencies {
     // XXPermissions
     implementation("com.github.getActivity:XXPermissions:18.63")
 
+
     implementation(files("src/main/java/site/sayaz/ts3client/lib/ts3j.jar"))
     implementation(files("src/main/java/site/sayaz/ts3client/lib/bcprov-jdk15on-1.60.jar"))
     implementation(files("src/main/java/site/sayaz/ts3client/lib/commons-lang-2.6.jar"))

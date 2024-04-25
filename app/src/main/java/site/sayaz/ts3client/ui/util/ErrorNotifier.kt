@@ -30,6 +30,8 @@ fun ErrorNotifier(appViewModel: AppViewModel, snackbarHostState: SnackbarHostSta
         stringResource(id = R.string.connection_timeout)
     val channelMaxClientReached =
         stringResource(id = R.string.channel_max_client_reached)
+    val tooManyClonesAlreadyConnected =
+        stringResource(id = R.string.too_many_clones_already_connected)
 
     scope.launch {
         when (errorMessage) {
@@ -46,6 +48,11 @@ fun ErrorNotifier(appViewModel: AppViewModel, snackbarHostState: SnackbarHostSta
             "channel maxclient reached" -> {
                 snackbarHostState.showSnackbar(
                     message = channelMaxClientReached,
+                )
+            }
+            "too many clones already connected" -> {
+                snackbarHostState.showSnackbar(
+                    message = tooManyClonesAlreadyConnected
                 )
             }
         }

@@ -12,24 +12,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import site.sayaz.ts3client.client.LoginData
+import site.sayaz.ts3client.client.ServerData
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ServerItem(loginData: LoginData, connectServer : (LoginData) -> Unit) {
+fun ServerItem(serverData: ServerData, connectServer : (ServerData) -> Unit) {
     ListItem(
-        headlineContent = { Text(loginData.hostname) },
-        supportingContent = { Text(loginData.nickname) },
+        headlineContent = { Text(serverData.hostname) },
+        supportingContent = { Text(serverData.nickname) },
         trailingContent = {
-            IconButton(onClick = { connectServer(loginData) }) {
+            IconButton(onClick = { connectServer(serverData) }) {
                 Icon(Icons.Default.PlayArrow, contentDescription = "enter")
             }
         },
         leadingContent = {
 //            Icon(
 //                Icons.Default.Info,
-//                contentDescription = "loginData Icon",
+//                contentDescription = "serverData Icon",
 //            )
         }
     )

@@ -10,14 +10,14 @@ class AudioInput : Microphone {
     // Microphone interface
     private val packetQueue: Queue<ByteArray> = LinkedList()
     private var state = InputState.STOP
-    private val AudioEncoder = AudioEncoder(48000, 1)
+    private val audioEncoder = AudioEncoder(48000, 1)
 
     fun start() {
         Log.d("AudioInput", "Starting audio input")
         state = InputState.START
     }
     fun write(buffer: ByteArray?) {
-        AudioEncoder.encode(buffer?: ByteArray(0)) {
+        audioEncoder.encode(buffer?: ByteArray(0)) {
             packetQueue.add(it)
         }
     }

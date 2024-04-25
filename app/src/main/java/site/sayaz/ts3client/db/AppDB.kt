@@ -4,11 +4,11 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import site.sayaz.ts3client.client.IdentityData
 import site.sayaz.ts3client.client.IdentityDataDao
-import site.sayaz.ts3client.client.LoginData
-import site.sayaz.ts3client.client.LoginDataDao
+import site.sayaz.ts3client.client.ServerData
+import site.sayaz.ts3client.client.ServerDataDao
 
-@Database(entities = [LoginData::class, IdentityData::class], version = 1)
+@Database(entities = [ServerData::class, IdentityData::class], version = 1)
 abstract class AppDB : RoomDatabase(){
-    abstract fun loginDataDao(): LoginDataDao
+    abstract fun loginDataDao(): ServerDataDao
     abstract fun identityDataDao(): IdentityDataDao
 }

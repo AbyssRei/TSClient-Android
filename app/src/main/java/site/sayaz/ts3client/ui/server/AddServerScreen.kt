@@ -43,7 +43,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import site.sayaz.ts3client.R
-import site.sayaz.ts3client.client.LoginData
+import site.sayaz.ts3client.client.ServerData
 import site.sayaz.ts3client.ui.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -184,7 +184,7 @@ fun AddServerContent(
 }
 private fun onDone(appViewModel: AppViewModel, navController: NavController, textFields: List<TextFieldValue>) {
     appViewModel.insertServer(
-        LoginData(
+        ServerData(
             0,
             textFields[0].text,
             textFields[1].text,

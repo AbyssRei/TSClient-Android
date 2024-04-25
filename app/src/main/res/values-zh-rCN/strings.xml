@@ -15,4 +15,5 @@
     <string name="permantely_permission_denied">权限被拒绝，请手动授权</string>
     <string name="permission_denied">权限被拒绝</string>
     <string name="channel_max_client_reached">频道达到最大人数</string>
+    <string name="too_many_clones_already_connected">重复连接过多</string>
 </resources>
