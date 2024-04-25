@@ -3,6 +3,7 @@ package site.sayaz.ts3client.client
 import android.content.ContentValues.TAG
 import android.util.Log
 import com.github.manevolent.ts3j.api.Channel
+import com.github.manevolent.ts3j.api.Client
 import com.github.manevolent.ts3j.api.VirtualServerInfo
 import com.github.manevolent.ts3j.command.SingleCommand
 import com.github.manevolent.ts3j.event.TS3Listener
@@ -23,6 +24,7 @@ class ClientSocket(
 ) {
 
     val channelList: Iterable<Channel> get() = _client.listChannels()
+    val clientList : Iterable<Client> get() = _client.listClients()
     private val _client = LocalTeamspeakClientSocket()
     val client: LocalTeamspeakClientSocket
         get() = _client
@@ -58,7 +60,7 @@ class ClientSocket(
     }
 
     @Throws(Exception::class)
-    fun switchChannel(channelID: Int,password: String = ""){
+    suspend fun switchChannel(channelID: Int,password: String = ""){
         _client.joinChannel(channelID,password)
     }
 
@@ -79,7 +81,7 @@ class ClientSocket(
         }
     }
 
-    fun getServerInfo() : VirtualServerInfo{
+    suspend fun getServerInfo() : VirtualServerInfo{
         if (!_client.isConnected) throw Exception("Not connected to server")
         try {
             return _client.executeCommand(
@@ -90,6 +92,9 @@ class ClientSocket(
         }
     }
 
+    suspend fun getClients(){
+        _client.listClients()
+    }
 
 
     fun disconnect() {

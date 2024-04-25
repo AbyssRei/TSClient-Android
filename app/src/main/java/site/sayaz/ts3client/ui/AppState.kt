@@ -1,6 +1,7 @@
 package site.sayaz.ts3client.ui
 
-import site.sayaz.ts3client.ui.channel.ChannelData
+import com.github.manevolent.ts3j.api.Channel
+import com.github.manevolent.ts3j.api.Client
 import site.sayaz.ts3client.client.ServerData
 import site.sayaz.ts3client.ui.server.ServerConnectionState
 
@@ -11,9 +12,12 @@ import site.sayaz.ts3client.ui.server.ServerConnectionState
  * @param servers: List of ServerData
  */
 data class AppState(
-    val channels : List<ChannelData> = emptyList(),
     val servers: List<ServerData> = emptyList(),
-    val errorMessage : String = "",
+    val channels : List<Channel> = emptyList(),
+    val clients : List<Client> = emptyList(),
+
     val serverConnectionStates: List<ServerConnectionState> = emptyList(),
-    val isInConnect : Boolean = false
+    val isInConnect : Boolean = false,
+
+    val errorMessage : String = "",
 )

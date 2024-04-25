@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,38 +32,26 @@ import androidx.compose.ui.tooling.preview.Preview
  * @param modifier: The modifier for the list
  *
  */
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun FoldList(
-    expandedState: MutableState<Boolean>,
-    title: @Composable () -> Unit,
-    items: @Composable () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    FoldList(
-        expandedState = expandedState,
-        title = title,
-        listItems = listOf(items),
-        modifier = modifier
-    )
-}
 
 @ExperimentalAnimationApi
 @Composable
 fun FoldList(
     expandedState: MutableState<Boolean>,
     title: @Composable () -> Unit,
-    listItems: List<@Composable () -> Unit>,
+    listItems: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scrollState = rememberLazyListState()
     Column {
-        Row{title()}
-        LazyColumn(state = scrollState, modifier = modifier.fillMaxWidth()) {
-            items(listItems) {
-                ExpandableCard(modifier, it, expandedState)
-            }
-        }
+        Row { title() }
+        ExpandableCard(
+            modifier = Modifier.fillMaxWidth(),
+            content = {
+                Column {
+                    listItems()
+                }
+            },
+            expandedState = expandedState
+        )
     }
 }
 
@@ -100,13 +89,10 @@ fun FoldListPreview() {
             }
             Text(text = "Title")
         },
-        listItems = listOf(
-            {
-                Text(text = "Item 1")
-            },
-            {
-                Text(text = "Item 2")
-            }
-        )
+        listItems = {
+            Text(text = "Item 1")
+            Text(text = "Item 2")
+        }
+
     )
 }

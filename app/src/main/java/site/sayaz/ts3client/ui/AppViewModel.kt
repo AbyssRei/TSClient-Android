@@ -4,6 +4,10 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.manevolent.ts3j.api.Channel
+import com.github.manevolent.ts3j.api.Client
+import com.github.manevolent.ts3j.event.ClientJoinEvent
+import com.github.manevolent.ts3j.event.ClientUpdatedEvent
 import com.github.manevolent.ts3j.event.TS3Listener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +22,7 @@ import site.sayaz.ts3client.audio.AudioInput
 import site.sayaz.ts3client.audio.AudioRecorder
 import site.sayaz.ts3client.client.ClientSocket
 import site.sayaz.ts3client.client.IdentityDataDao
-import site.sayaz.ts3client.ui.channel.ChannelData
+import site.sayaz.ts3client.client.Listener
 import site.sayaz.ts3client.client.ServerData
 import site.sayaz.ts3client.client.ServerDataDao
 import site.sayaz.ts3client.ui.server.ConnectionState
@@ -27,9 +31,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AppViewModel @Inject constructor(
-    val identityDataDao: IdentityDataDao,
-    val serverDataDao: ServerDataDao,
-    application: Application
+    val identityDataDao: IdentityDataDao, val serverDataDao: ServerDataDao, application: Application
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(AppState())
@@ -41,16 +43,12 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch {
             val serversFromDb = serverDataDao.getAll()
             if (serversFromDb.isNotEmpty()) {
-                _uiState.value = AppState(
-                    servers = serversFromDb,
-                    serverConnectionStates =
-                    serversFromDb.map {
+                _uiState.value =
+                    AppState(servers = serversFromDb, serverConnectionStates = serversFromDb.map {
                         ServerConnectionState(
-                            it.id,
-                            ConnectionState.NOT_CONNECTED
+                            it.id, ConnectionState.NOT_CONNECTED
                         )
-                    }
-                )
+                    })
             }
         }
     }
@@ -61,10 +59,8 @@ class AppViewModel @Inject constructor(
             viewModelScope.launch { serverDataDao.insert(server) }
             it.copy(
                 servers = it.servers + server,
-                serverConnectionStates =
-                it.serverConnectionStates + ServerConnectionState(
-                    server.id,
-                    ConnectionState.NOT_CONNECTED
+                serverConnectionStates = it.serverConnectionStates + ServerConnectionState(
+                    server.id, ConnectionState.NOT_CONNECTED
                 )
             )
         }
@@ -78,7 +74,8 @@ class AppViewModel @Inject constructor(
     fun connectServer(server: ServerData) {
         val audioRecorder = AudioRecorder(getApplication(), AudioInput())
         val socket = ClientSocket(server, identityDataDao, audioRecorder)
-        val ts3Listener = object : TS3Listener {}
+        clientSockets = socket
+        val ts3Listener = Listener({ updateChannelList() }, { updateClientList() })
         viewModelScope.launch {
             try {
                 lockInConnect(true)
@@ -86,7 +83,7 @@ class AppViewModel @Inject constructor(
                     updateServerConnectionState(server.id, ConnectionState.CONNECTING)
                     socket.connect(ts3Listener)
                     // Connection successful
-                    clientSockets = socket
+
                     onConnectSuccess(server)
                 }
             } catch (e: Exception) {
@@ -102,19 +99,8 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 // get channel list
-                withContext(Dispatchers.IO) {
-                    clientSockets.channelList.forEach { channel ->
-                        _uiState.update {
-                            it.copy(
-                                channels = it.channels + ChannelData(
-                                    channelID = channel.id,
-                                    channelName = channel.name,
-                                    members = emptyList()
-                                )
-                            )
-                        }
-                    }
-                }
+                updateChannelList()
+                updateClientList()
                 updateServerConnectionState(server.id, ConnectionState.CONNECTED)
             } catch (e: Exception) {
                 showErrorMessage(e.message)
@@ -122,7 +108,6 @@ class AppViewModel @Inject constructor(
             }
         }
     }
-
 
     fun switchChannel(channelID: Int) {
         viewModelScope.launch {
@@ -146,7 +131,9 @@ class AppViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 if (this@AppViewModel::clientSockets.isInitialized) {
                     clientSockets.disconnect()
-                    updateServerConnectionState(clientSockets.serverData.id, ConnectionState.NOT_CONNECTED)
+                    updateServerConnectionState(
+                        clientSockets.serverData.id, ConnectionState.NOT_CONNECTED
+                    )
                     lockInConnect(false)
                 }
             }
@@ -171,23 +158,47 @@ class AppViewModel @Inject constructor(
 
     private fun updateServerConnectionState(serverId: Int, connectionState: ConnectionState) {
         _uiState.update {
-            it.copy(
-                serverConnectionStates = it.serverConnectionStates.map {
-                    if (it.serverId == serverId) {
-                        it.copy(connectionState = connectionState)
-                    } else {
-                        it
-                    }
+            it.copy(serverConnectionStates = it.serverConnectionStates.map {
+                if (it.serverId == serverId) {
+                    it.copy(connectionState = connectionState)
+                } else {
+                    it
                 }
-            )
+            })
         }
     }
 
-    private fun lockInConnect(value : Boolean) {
+    private fun lockInConnect(value: Boolean) {
         _uiState.update {
             it.copy(
                 isInConnect = value
             )
+        }
+    }
+
+    private fun updateClientList() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val clientList = clientSockets.clientList.toList()
+                _uiState.update {
+                    it.copy(
+                        clients = clientList
+                    )
+                }
+            }
+        }
+    }
+
+    private fun updateChannelList() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val channelList = clientSockets.channelList.toList()
+                _uiState.update {
+                    it.copy(
+                        channels = channelList
+                    )
+                }
+            }
         }
     }
 }
