@@ -103,7 +103,8 @@ fun TS3ClientTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colors.primary.toArgb()
+            val color = colors.primary.toArgb()
+            window.statusBarColor = color
             WindowCompat
                 .getInsetsController(window, view)
                 .isAppearanceLightStatusBars = useDarkTheme

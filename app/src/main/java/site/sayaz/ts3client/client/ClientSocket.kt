@@ -1,6 +1,7 @@
 package site.sayaz.ts3client.client
 
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.util.Log
 import com.github.manevolent.ts3j.api.Channel
 import com.github.manevolent.ts3j.api.Client
@@ -12,17 +13,19 @@ import com.github.manevolent.ts3j.protocol.ProtocolRole
 import com.github.manevolent.ts3j.protocol.socket.client.LocalTeamspeakClientSocket
 import site.sayaz.ts3client.audio.AudioPlayer
 import site.sayaz.ts3client.audio.AudioRecorder
+import site.sayaz.ts3client.audio.AudioService
 import site.sayaz.ts3client.util.base64Sha1
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
 
 class ClientSocket(
-    val serverData: ServerData,
     private val identityDataDao: IdentityDataDao,
     private val audioRecorder: AudioRecorder,
+    private val audioPlayer: AudioPlayer,
+    private val listener: TS3Listener
 ) {
-
+    lateinit var serverData: ServerData
     val channelList: Iterable<Channel> get() = _client.listChannels()
     val clientList : Iterable<Client> get() = _client.listClients()
     private val _client = LocalTeamspeakClientSocket()
@@ -33,11 +36,8 @@ class ClientSocket(
         get() = _client.isConnected
 
     @Throws(Exception::class)
-    suspend fun connect(ts3Listener: TS3Listener): LocalTeamspeakClientSocket {
-        // Set up _client
-        val listener: TS3Listener = ts3Listener
+    suspend fun connect(serverData: ServerData): LocalTeamspeakClientSocket {
         val identity: LocalIdentity = getIdentity()
-        val audioPlayer = AudioPlayer()
 
         _client.setIdentity(identity)
         _client.addListener(listener)
@@ -50,10 +50,10 @@ class ClientSocket(
             10000L
         )
         _client.subscribeAll()
-
-        //audio
-        audioRecorder.start()
+        this.serverData = serverData
+        //audio service
         audioPlayer.start()
+        audioRecorder.start()
 
         Log.d("ClientSocket", "Connected to ${serverData.hostname}")
         return _client
@@ -84,9 +84,13 @@ class ClientSocket(
     suspend fun getServerInfo() : VirtualServerInfo{
         if (!_client.isConnected) throw Exception("Not connected to server")
         try {
-            return _client.executeCommand(
-                SingleCommand("serverinfo", ProtocolRole.CLIENT)
-            ) .get().toList().first().parameters as VirtualServerInfo
+            return VirtualServerInfo(
+                _client.executeCommand(
+                    SingleCommand("serverinfo", ProtocolRole.CLIENT)
+                ).get().toList().first().parameters.associate {
+                    it.name to it.value
+                }
+            )
         }catch (e: Exception) {
             throw Exception("Failed to get server info")
         }
@@ -98,7 +102,8 @@ class ClientSocket(
 
 
     fun disconnect() {
-        _client.disconnect()
+        _client.disconnect("Bye~")
         audioRecorder.stop()
+        audioPlayer.stop()
     }
 }

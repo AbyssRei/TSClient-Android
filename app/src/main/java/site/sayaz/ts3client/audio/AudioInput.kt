@@ -49,6 +49,7 @@ class AudioInput : Microphone {
                 return ByteArray(0)
             }
             // underflow
+            //Log.d("AudioInput", "Providing packet.")
             packet
         } catch (ex: NoSuchElementException) {
             Log.d("AudioInput", "No packets available.")

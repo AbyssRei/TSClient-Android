@@ -31,14 +31,13 @@ class FileTest {
             base64Sha1(""),
             10000L
         )
-        val m : MutableMap<String, String> = mutableMapOf()
-        client.executeCommand(
-            SingleCommand("serverinfo", ProtocolRole.CLIENT),
-        ).get().toList().first().parameters.forEach(){
-            if (it.name != null && it.value != null)
-                m[it.name] = it.value
-        }
-        val info = VirtualServerInfo(m.toMap())
+        val info = VirtualServerInfo(
+            client.executeCommand(
+                SingleCommand("serverinfo", ProtocolRole.CLIENT)
+            ).get().toList().first().parameters.associate {
+                it.name to it.value
+            }
+        )
 
         // get channel icon id
         val channel = client.listChannels().toList()[0]
@@ -70,11 +69,11 @@ class FileTest {
 
 
         // 获取文件下载的端口和密码
-        val port = 7777
+        val port = 90009
         val ftkey = ""
 
         // 创建一个新的 Socket 连接到文件下载的端口
-        val socket = Socket("62.234.161.235", port)
+        val socket = Socket("", port)
 
         // 发送文件下载的请求
         val outputStream = socket.getOutputStream()

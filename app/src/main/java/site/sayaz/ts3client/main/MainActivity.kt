@@ -2,6 +2,7 @@ package site.sayaz.ts3client.main
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -30,17 +31,20 @@ import javax.inject.Singleton
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("MainActivity", "onCreate")
         XXPermissions.with(this)
             .permission(Permission.RECORD_AUDIO)
+            .permission(Permission.NOTIFICATION_SERVICE)
             .request(object : OnPermissionCallback {
                 override fun onGranted(permissions: MutableList<String>, allGranted: Boolean) {}
                 override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
                     if (doNotAskAgain) {
-                        toast(applicationContext,"被永久拒绝授权，请手动授予录音和日历权限")
+                        toast(applicationContext, "被永久拒绝授权，请手动授予录音和日历权限")
                         // 如果是被永久拒绝就跳转到应用权限系统设置页面
                         XXPermissions.startPermissionActivity(applicationContext, permissions)
                     } else {
-                        toast(applicationContext,"获取录音和日历权限失败")
+                        //TODO
+                        toast(applicationContext, "获取录音和日历权限失败")
                     }
                 }
             })
@@ -57,11 +61,28 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("MainActivity", "onDestroy")
+    }
+    override fun onStart() {
+        super.onStart()
+        Log.d("MainActivity", "onStart")
+    }
     override fun onStop() {
         super.onStop()
-        val appViewModel : AppViewModel by viewModels()
-        runBlocking { appViewModel.disconnect() }
-
+        Log.d("MainActivity", "onStop")
+    }
+    override fun onResume() {
+        super.onResume()
+        Log.d("MainActivity", "onResume")
+    }
+    override fun onPause() {
+        super.onPause()
+        Log.d("MainActivity", "onPause")
+    }
+    override fun onRestart() {
+        super.onRestart()
+        Log.d("MainActivity", "onRestart")
     }
 }

@@ -79,7 +79,8 @@ fun MainScaffold(mainNavController: NavController, appViewModel: AppViewModel = 
         bottomBar = { BottomNav(navController = navController, selectedIndex) },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
-            AnimatedVisibility(visible = selectedIndex.intValue == 0) {
+            AnimatedVisibility(visible = selectedIndex.intValue == 0,
+                enter = enterTransition, exit = exitTransition) {
                 FloatingActionButton(onClick = { mainNavController.navigate(MainRoute.ADD_SERVER.name) }) {
                     Icon(Icons.Filled.Add, contentDescription = "add Server")
                 }

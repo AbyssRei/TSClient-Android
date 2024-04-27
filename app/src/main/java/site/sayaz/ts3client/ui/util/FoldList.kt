@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
 /**
  * A list of items that can be expanded to show more content.
@@ -38,13 +40,11 @@ import androidx.compose.ui.tooling.preview.Preview
 fun FoldList(
     expandedState: MutableState<Boolean>,
     title: @Composable () -> Unit,
-    listItems: @Composable ColumnScope.() -> Unit,
-    modifier: Modifier = Modifier
+    listItems: @Composable ColumnScope.() -> Unit
 ) {
     Column {
         Row { title() }
-        ExpandableCard(
-            modifier = Modifier.fillMaxWidth(),
+        ExpandableContent(
             content = {
                 Column {
                     listItems()
@@ -57,12 +57,10 @@ fun FoldList(
 
 @ExperimentalAnimationApi
 @Composable
-fun ExpandableCard(
-    modifier: Modifier,
+fun ExpandableContent(
     content: @Composable () -> Unit,
     expandedState: MutableState<Boolean>
 ) {
-    Card(modifier = modifier) {
         AnimatedVisibility(
             visible = expandedState.value,
             enter = expandVertically(animationSpec = tween(300)),
@@ -70,7 +68,6 @@ fun ExpandableCard(
         ) {
             content()
         }
-    }
 }
 
 /**
@@ -85,9 +82,9 @@ fun FoldListPreview() {
         expandedState = expandedState,
         title = {
             IconButton(onClick = { expandedState.value = !expandedState.value }) {
-                Icon(Icons.Filled.ExpandMore, contentDescription = "")
+                Icon(Icons.Filled.ExpandMore, contentDescription = "",Modifier.size(24.dp))
             }
-            Text(text = "Title")
+            Text(text = "Title",Modifier.size(24.dp).fillMaxWidth())
         },
         listItems = {
             Text(text = "Item 1")

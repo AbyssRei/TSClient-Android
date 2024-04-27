@@ -56,5 +56,6 @@ class AudioPlayer {
     fun stop() {
         audioTrack.stop()
         audioTrack.release()
+        isPlaying = false
     }
 }

@@ -1,14 +1,12 @@
 package site.sayaz.ts3client.ui
 
 import android.app.Application
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.manevolent.ts3j.api.Channel
-import com.github.manevolent.ts3j.api.Client
-import com.github.manevolent.ts3j.event.ClientJoinEvent
-import com.github.manevolent.ts3j.event.ClientUpdatedEvent
-import com.github.manevolent.ts3j.event.TS3Listener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -19,12 +17,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import site.sayaz.ts3client.audio.AudioInput
+import site.sayaz.ts3client.audio.AudioPlayer
 import site.sayaz.ts3client.audio.AudioRecorder
 import site.sayaz.ts3client.client.ClientSocket
 import site.sayaz.ts3client.client.IdentityDataDao
 import site.sayaz.ts3client.client.Listener
 import site.sayaz.ts3client.client.ServerData
 import site.sayaz.ts3client.client.ServerDataDao
+import site.sayaz.ts3client.audio.AudioService
+import site.sayaz.ts3client.audio.AudioServiceConnection
 import site.sayaz.ts3client.ui.server.ConnectionState
 import site.sayaz.ts3client.ui.server.ServerConnectionState
 import javax.inject.Inject
@@ -36,7 +37,12 @@ class AppViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(AppState())
     val uiState: StateFlow<AppState> = _uiState.asStateFlow()
-    private lateinit var clientSockets: ClientSocket
+
+    //Create audio service
+    private val audioIntent: Intent
+    private val ts3Listener = Listener({ updateChannelList() }, { updateClientList() })
+    private val audioServiceConnection : AudioServiceConnection
+    private lateinit var clientSockets : ClientSocket
 
     init {
         Log.d("AppViewModel", "init viewmodel")
@@ -50,6 +56,21 @@ class AppViewModel @Inject constructor(
                         )
                     })
             }
+        }
+        audioIntent = Intent(application, AudioService::class.java)
+        audioServiceConnection = AudioServiceConnection()
+        application.bindService(audioIntent, audioServiceConnection, Context.BIND_AUTO_CREATE)
+        viewModelScope.launch {
+            while (!audioServiceConnection.isBound) {
+                delay(100) // Wait for the service to be bound
+            }
+            val audioRecorder = audioServiceConnection.audioService?.audioRecorder
+            val audioPlayer = audioServiceConnection.audioService?.audioPlayer
+            if (audioRecorder == null || audioPlayer == null) {
+                throw Exception("Failed to create audio service")
+            }
+            Log.d("AppViewModel", "Audio service created")
+            clientSockets = ClientSocket(identityDataDao, audioRecorder, audioPlayer, ts3Listener)
         }
     }
 
@@ -68,22 +89,18 @@ class AppViewModel @Inject constructor(
 
     /**
      * Connect to the server and get the channel list
+     * if success will start a foreground service
      * @param server: ServerData
      * @throws Exception
      */
     fun connectServer(server: ServerData) {
-        val audioRecorder = AudioRecorder(getApplication(), AudioInput())
-        val socket = ClientSocket(server, identityDataDao, audioRecorder)
-        clientSockets = socket
-        val ts3Listener = Listener({ updateChannelList() }, { updateClientList() })
         viewModelScope.launch {
             try {
                 lockInConnect(true)
                 withContext(Dispatchers.IO) {
                     updateServerConnectionState(server.id, ConnectionState.CONNECTING)
-                    socket.connect(ts3Listener)
+                    clientSockets.connect(server)
                     // Connection successful
-
                     onConnectSuccess(server)
                 }
             } catch (e: Exception) {
@@ -102,6 +119,8 @@ class AppViewModel @Inject constructor(
                 updateChannelList()
                 updateClientList()
                 updateServerConnectionState(server.id, ConnectionState.CONNECTED)
+                // Start the audio service
+                getApplication<Application>().startService(audioIntent)
             } catch (e: Exception) {
                 showErrorMessage(e.message)
                 e.printStackTrace()
@@ -129,7 +148,7 @@ class AppViewModel @Inject constructor(
     fun disconnect() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                if (this@AppViewModel::clientSockets.isInitialized) {
+                if (clientSockets.isConnected) {
                     clientSockets.disconnect()
                     updateServerConnectionState(
                         clientSockets.serverData.id, ConnectionState.NOT_CONNECTED
