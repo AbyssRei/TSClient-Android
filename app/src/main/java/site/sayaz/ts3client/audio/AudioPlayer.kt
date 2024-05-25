@@ -59,9 +59,10 @@ class AudioPlayer {
     }
 
     fun stop() {
-        audioTrack.stop()
-        audioTrack.release()
-        outputState = OutputState.STOP
+        if (audioTrack.state != AudioTrack.STATE_UNINITIALIZED) {
+            audioTrack.stop()
+            outputState = OutputState.STOP
+        }
     }
 }
 enum class OutputState {

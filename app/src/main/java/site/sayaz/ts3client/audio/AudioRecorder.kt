@@ -11,6 +11,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.github.manevolent.ts3j.audio.Microphone
 import com.hjq.permissions.XXPermissions
+import site.sayaz.ts3client.R
 import site.sayaz.ts3client.audio.AudioInput
 import site.sayaz.ts3client.ui.util.toast
 import java.lang.Exception
@@ -39,8 +40,7 @@ class AudioRecorder(val context: Context,private val audioInput: AudioInput) {
                     Manifest.permission.RECORD_AUDIO
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                //TODO
-                toast(context, "Please grant audio permission")
+                toast(context, context.getString(R.string.no_audio_permission))
                 XXPermissions.startPermissionActivity(context)
                 return
             }
@@ -68,9 +68,10 @@ class AudioRecorder(val context: Context,private val audioInput: AudioInput) {
     }
 
     fun stop() {
-        isRecording = false
-        audioRecord.stop()
-        audioRecord.release()
+        if (::audioRecord.isInitialized && isRecording) {
+            isRecording = false
+            audioRecord.stop()
+        }
     }
 
     fun getAudioInput(): Microphone {

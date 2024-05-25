@@ -20,4 +20,5 @@
     <string name="connected_to_server">Connected to server</string>
     <string name="microphone_service">TeamSpeak is using your microphone...</string>
     <string name="disconnect">Disconnect</string>
+    <string name="no_audio_permission">No audio permission</string>
 </resources>

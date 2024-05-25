@@ -66,7 +66,7 @@ fun MainScaffold(mainNavController: NavController, appViewModel: AppViewModel = 
                 selectedIndex.intValue == 1,
                 topNavItem[selectedIndex.intValue].titleID
             ) {
-                ChannelAction(appViewModel, appState)
+                ChannelAction(appViewModel, appState, appViewModel::disconnect)
             }
             AnimatedTopAppBar(
                 selectedIndex.intValue == 2,

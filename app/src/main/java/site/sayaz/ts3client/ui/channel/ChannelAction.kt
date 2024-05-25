@@ -25,7 +25,7 @@ import site.sayaz.ts3client.ui.AppState
 
 
 @Composable
-fun ChannelAction(audioController: AudioController, appState: AppState) {
+fun ChannelAction(audioController: AudioController, appState: AppState,onDisconnect : () -> Unit){
     val dropdownMenuExpanded = remember{ mutableStateOf(false) }
     when(appState.isInConnect){
         true -> {
@@ -66,7 +66,7 @@ fun ChannelAction(audioController: AudioController, appState: AppState) {
                 onDismissRequest = { dropdownMenuExpanded.value = false }
             ) {
                 DropdownMenuItem(onClick = {
-                    // 处理点击事件
+                    onDisconnect()
                     dropdownMenuExpanded.value = false
                 },
                     text = {

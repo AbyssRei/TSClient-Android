@@ -37,7 +37,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AppViewModel @Inject constructor(
     val identityDataDao: IdentityDataDao, val serverDataDao: ServerDataDao, application: Application
-) : AndroidViewModel(application), ChannelStateInterface,AudioController {
+) : AndroidViewModel(application), ChannelStateInterface, AudioController {
 
     private val _uiState = MutableStateFlow(AppState())
     val uiState: StateFlow<AppState> = _uiState.asStateFlow()
@@ -152,10 +152,16 @@ class AppViewModel @Inject constructor(
 
     /**
      * Disconnect from the server
+     * 断开音频输入输出
+     * 断开服务器连接
+     * 终止音频服务
+     * 删除频道页代码
+     * 重置服务器页连接状态
      */
     fun disconnect() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                Log.d("AppViewModel", "Disconnecting")
                 if (clientSockets.isConnected) {
                     clientSockets.disconnect()
                     updateServerConnectionState(
@@ -163,7 +169,30 @@ class AppViewModel @Inject constructor(
                     )
                     lockInConnect(false)
                 }
+                audioRecorder.stop()
+                audioPlayer.stop()
+                getApplication<Application>().stopService(audioIntent)
+                _uiState.update {
+                    it.copy(
+                        channels = emptyList(),
+                        clients = emptyList()
+                    )
+                }
+                Log.d("AppViewModel", "Disconnected")
+
+                //reinit
+                while (!audioServiceConnection.isBound) {
+                    delay(100) // Wait for the service to be bound
+                }
+                audioRecorder = audioServiceConnection.audioService.audioRecorder
+                audioPlayer = audioServiceConnection.audioService.audioPlayer
+                Log.d("AppViewModel", "Audio service reinitialized")
+                clientSockets =
+                    ClientSocket(identityDataDao, audioRecorder, audioPlayer, ts3Listener)
+                Log.d("AppViewModel", "ClientSocket reinitialized")
             }
+
+
         }
     }
 
@@ -396,7 +425,6 @@ class AppViewModel @Inject constructor(
             )
         }
     }
-
 
 
     fun updateClientList() {
