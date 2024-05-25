@@ -19,4 +19,5 @@
     <string name="problem_establishing_client_connection">Problem establishing client connection</string>
     <string name="connected_to_server">Connected to server</string>
     <string name="microphone_service">TeamSpeak is using your microphone...</string>
+    <string name="disconnect">Disconnect</string>
 </resources>

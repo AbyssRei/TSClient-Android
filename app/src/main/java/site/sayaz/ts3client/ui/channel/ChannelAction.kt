@@ -7,19 +7,26 @@ import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
+import site.sayaz.ts3client.R
 import site.sayaz.ts3client.ui.AppState
 
-//TODO 断开当前连接
+
 //TODO 打开消息页面
-//TODO 开关麦
-//TODO 扬声器开关
+
 
 @Composable
 fun ChannelAction(audioController: AudioController, appState: AppState) {
+    val dropdownMenuExpanded = remember{ mutableStateOf(false) }
     when(appState.isInConnect){
         true -> {
             // open/close speaker
@@ -50,8 +57,22 @@ fun ChannelAction(audioController: AudioController, appState: AppState) {
                 }
             }
             // more
-            IconButton(onClick = {}){
+            IconButton(onClick = {dropdownMenuExpanded.value = true}){
                 Icon(Icons.Default.MoreVert, contentDescription = "More")
+            }
+
+            DropdownMenu(
+                expanded = dropdownMenuExpanded.value,
+                onDismissRequest = { dropdownMenuExpanded.value = false }
+            ) {
+                DropdownMenuItem(onClick = {
+                    // 处理点击事件
+                    dropdownMenuExpanded.value = false
+                },
+                    text = {
+                        Text(text = stringResource(id = R.string.disconnect))
+                    }
+                )
             }
         }
         false -> {}
