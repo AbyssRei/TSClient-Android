@@ -9,6 +9,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import site.sayaz.ts3client.db.AppDB
+import site.sayaz.ts3client.settings.SettingsDBCallback
 import javax.inject.Singleton
 
 
@@ -23,9 +24,10 @@ object DatabaseModule {
             appContext,
             AppDB::class.java,
             "TS3db"
-        ).build()
+        ).addCallback(SettingsDBCallback).build()
     }
-
+    @Provides
+    fun settingsDataDao(database:AppDB) = database.settingsDataDao()
     @Provides
     fun provideLoginDataDao(database:AppDB) = database.loginDataDao()
 

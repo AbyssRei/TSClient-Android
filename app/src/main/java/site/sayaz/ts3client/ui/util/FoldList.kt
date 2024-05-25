@@ -99,6 +99,5 @@ fun FoldListPreview() {
                 Text(text = "Item 2")
             }
         }
-
     )
 }

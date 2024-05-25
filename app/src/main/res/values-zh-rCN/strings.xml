@@ -18,6 +18,9 @@
     <string name="too_many_clones_already_connected">重复连接过多</string>
     <string name="problem_establishing_client_connection">无法建立连接</string>
     <string name="connected_to_server">已连接到服务器</string>
-    <string name="microphone_service">"TeamSpeak正在使用你的麦克风... "</string>
+    <string name="microphone_service">"TeamSpeak正在使用麦克风... "</string>
     <string name="disconnect">断开连接</string>
+    <string name="no_audio_permission">无音频权限</string>
+    <string name="about">关于</string>
+    <string name="space">" "</string>
 </resources>

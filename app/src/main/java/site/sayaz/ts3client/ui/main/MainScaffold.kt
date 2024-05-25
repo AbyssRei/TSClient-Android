@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import site.sayaz.ts3client.R
 import site.sayaz.ts3client.ui.AppViewModel
 import site.sayaz.ts3client.ui.channel.ChannelAction
 import site.sayaz.ts3client.ui.channel.ChannelLayout
@@ -70,7 +71,7 @@ fun MainScaffold(mainNavController: NavController, appViewModel: AppViewModel = 
             }
             AnimatedTopAppBar(
                 selectedIndex.intValue == 2,
-                topNavItem[selectedIndex.intValue].titleID
+                R.string.space
             ) {}
         },
         bottomBar = { BottomNav(navController = navController, selectedIndex) },

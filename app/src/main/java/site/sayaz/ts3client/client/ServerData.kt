@@ -1,20 +1,23 @@
 package site.sayaz.ts3client.client
 
+import android.os.Parcelable
 import androidx.room.Dao
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import com.github.manevolent.ts3j.api.IconFile
+import kotlinx.parcelize.Parcelize
 
 @Entity
+@Parcelize
 data class ServerData (
     @PrimaryKey(autoGenerate = true) val id: Int,
     val hostname:String,
     val password:String,
     val nickname:String,
 
-)
+) : Parcelable
 
 @Dao
 interface ServerDataDao {

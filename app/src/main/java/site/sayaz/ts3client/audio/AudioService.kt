@@ -5,10 +5,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
 import android.os.Binder
 import android.os.IBinder
+import android.os.PowerManager
+import android.util.Log
 import androidx.compose.ui.res.stringResource
 import site.sayaz.ts3client.R
 import site.sayaz.ts3client.main.MainActivity
@@ -20,11 +23,14 @@ class AudioService : Service() {
     val audioRecorder = AudioRecorder(this, AudioInput())
     val audioPlayer = AudioPlayer()
 
+    private var wakeLock: PowerManager.WakeLock? = null
+
     private var startTime = System.currentTimeMillis()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // create a notification
         val channelID = "MicrophoneService"
+
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val notificationChannel = NotificationChannel(
             channelID,
@@ -37,9 +43,6 @@ class AudioService : Service() {
             this, 0, notificationIntent,
             PendingIntent.FLAG_IMMUTABLE
         )
-
-
-
 
         val notification = Notification.Builder(this,channelID)
             .setContentTitle(this.getString(R.string.connected_to_server))
@@ -58,10 +61,18 @@ class AudioService : Service() {
     override fun onBind(intent: Intent): IBinder {
         return (binder as AudioBinder)
     }
+    override fun onDestroy() {
+        super.onDestroy()
+        wakeLock?.let {
+            if (it.isHeld) {
+                it.release()
+            }
+        }
+    }
+
 
 
     inner class AudioBinder() : Binder() {
-
         val service: AudioService
             get() = this@AudioService
     }

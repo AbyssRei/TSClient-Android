@@ -3,7 +3,9 @@ package site.sayaz.ts3client.ui
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import site.sayaz.ts3client.R
 import site.sayaz.ts3client.audio.AudioPlayer
 import site.sayaz.ts3client.audio.AudioRecorder
 import site.sayaz.ts3client.client.ClientSocket
@@ -24,6 +27,7 @@ import site.sayaz.ts3client.client.ServerData
 import site.sayaz.ts3client.client.ServerDataDao
 import site.sayaz.ts3client.audio.AudioService
 import site.sayaz.ts3client.audio.AudioServiceConnection
+import site.sayaz.ts3client.settings.SettingsDataDao
 import site.sayaz.ts3client.ui.channel.AudioController
 import site.sayaz.ts3client.ui.channel.ChannelData
 import site.sayaz.ts3client.ui.channel.ChannelStateInterface
@@ -32,15 +36,41 @@ import site.sayaz.ts3client.ui.channel.ClientState
 import site.sayaz.ts3client.ui.channel.toData
 import site.sayaz.ts3client.ui.server.ConnectionState
 import site.sayaz.ts3client.ui.server.ServerConnectionState
+import site.sayaz.ts3client.ui.util.toast
 import javax.inject.Inject
 
 @HiltViewModel
 class AppViewModel @Inject constructor(
-    val identityDataDao: IdentityDataDao, val serverDataDao: ServerDataDao, application: Application
+    val identityDataDao: IdentityDataDao,
+    val serverDataDao: ServerDataDao,
+    val settingsDataDao: SettingsDataDao,
+    application: Application
 ) : AndroidViewModel(application), ChannelStateInterface, AudioController {
 
     private val _uiState = MutableStateFlow(AppState())
     val uiState: StateFlow<AppState> = _uiState.asStateFlow()
+
+    var preventSleepDuringConnection = false
+        set(checked) {
+            Log.d("AppViewModel", "preventSleepDuringConnection: $checked")
+            _uiState.update {
+                it.copy(
+                    settingsData = it.settingsData.copy(preventSleepDuringConnection = checked)
+                )
+            }
+            field = checked
+            viewModelScope.launch {
+                withContext(Dispatchers.IO){
+                    settingsDataDao.setSettingsData(_uiState.value.settingsData)
+                }
+            }
+            toast(
+                getApplication(),
+                (getApplication() as Context).getString(R.string.restart_app_to_apply)
+            )
+
+        }
+
 
     //Create audio service
     private val audioIntent: Intent
@@ -54,14 +84,22 @@ class AppViewModel @Inject constructor(
     init {
         Log.d("AppViewModel", "init viewmodel")
         viewModelScope.launch {
-            val serversFromDb = serverDataDao.getAll()
-            if (serversFromDb.isNotEmpty()) {
-                _uiState.value =
-                    AppState(servers = serversFromDb, serverConnectionStates = serversFromDb.map {
-                        ServerConnectionState(
-                            it.id, ConnectionState.NOT_CONNECTED
-                        )
-                    })
+            withContext(Dispatchers.IO){
+                // Load database
+                val serversFromDb = serverDataDao.getAll()
+                if (serversFromDb.isNotEmpty()) {
+                    _uiState.value =
+                        AppState(servers = serversFromDb, serverConnectionStates = serversFromDb.map {
+                            ServerConnectionState(
+                                it.id, ConnectionState.NOT_CONNECTED
+                            )
+                        })
+                }
+
+                val settingsData = settingsDataDao.getSettingsData()
+                _uiState.update {
+                    it.copy(settingsData = settingsData)
+                }
             }
         }
         audioIntent = Intent(application, AudioService::class.java)
@@ -463,4 +501,13 @@ class AppViewModel @Inject constructor(
             }
         }
     }
+
+    fun saveState(outState: Bundle) {
+        outState.putParcelable("appState", _uiState.value)
+    }
+
+    fun restoreState(savedInstanceState: Bundle) {
+        _uiState.value = savedInstanceState.getParcelable("appState")!!
+    }
+
 }

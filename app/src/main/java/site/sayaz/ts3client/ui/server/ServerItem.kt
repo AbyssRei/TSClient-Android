@@ -8,10 +8,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,7 +38,7 @@ fun ServerItem(serverData: ServerData, appViewModel: AppViewModel) {
                     ConnectionState.CONNECTED -> Icon(
                         Icons.Default.Done,
                         contentDescription = "serverData Icon",
-                        tint = Color.Green
+                        tint = MaterialTheme.colorScheme.primary
                     )
 
                     ConnectionState.CONNECTING -> CircularProgressIndicator(Modifier.size(24.dp))
@@ -44,25 +46,25 @@ fun ServerItem(serverData: ServerData, appViewModel: AppViewModel) {
                     ConnectionState.ERROR -> Icon(
                         Icons.Default.Close,
                         contentDescription = "serverData Icon",
-                        tint = if (appState.isInConnect) Color.Gray else Color.Red
+                        tint = if (appState.isInConnect) Color.Gray else MaterialTheme.colorScheme.error
                     )
 
                     ConnectionState.NOT_CONNECTED -> Icon(
                         Icons.Default.PlayArrow,
                         contentDescription = "serverData Icon",
-                        tint = if (appState.isInConnect) Color.Gray else Color.Black
+                        tint = if (appState.isInConnect) Color.Gray else MaterialTheme.colorScheme.secondary
                     )
-
                     null -> {}
                 }
             }
+        },
+        leadingContent = {
+            Icon(
+                Icons.Outlined.Dns,
+                contentDescription = "serverData Icon",
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
-//        leadingContent = {
-//            Icon(
-//                Icons.Default.Info,
-//                contentDescription = "serverData Icon",
-//            )
-//        }
     )
     Spacer(modifier = Modifier.height(8.dp))
 }

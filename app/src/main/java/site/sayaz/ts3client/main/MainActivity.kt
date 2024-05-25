@@ -8,6 +8,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
 import com.hjq.permissions.OnPermissionCallback
@@ -19,18 +22,27 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import site.sayaz.ts3client.R
 import site.sayaz.ts3client.db.AppDB
+import site.sayaz.ts3client.settings.SettingsDataDao
 import site.sayaz.ts3client.ui.AppViewModel
 import site.sayaz.ts3client.ui.main.MainScreen
 import site.sayaz.ts3client.ui.theme.TS3ClientTheme
 import site.sayaz.ts3client.ui.util.toast
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private lateinit var viewmodel: AppViewModel
+    @Inject lateinit var settingsDataDao: SettingsDataDao
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewmodel = ViewModelProvider(this)[AppViewModel::class.java]
         Log.d("MainActivity", "onCreate")
         XXPermissions.with(this)
             .permission(Permission.RECORD_AUDIO)
@@ -39,12 +51,15 @@ class MainActivity : ComponentActivity() {
                 override fun onGranted(permissions: MutableList<String>, allGranted: Boolean) {}
                 override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
                     if (doNotAskAgain) {
-                        toast(applicationContext, "被永久拒绝授权，请手动授予录音和日历权限")
-                        // 如果是被永久拒绝就跳转到应用权限系统设置页面
-                        XXPermissions.startPermissionActivity(applicationContext, permissions)
+                        toast(
+                            applicationContext,
+                            this@MainActivity.getString(R.string.permission_denied_forever)
+                        )
                     } else {
-                        //TODO
-                        toast(applicationContext, "获取录音和日历权限失败")
+                        toast(
+                            applicationContext,
+                            this@MainActivity.getString(R.string.permission_denied)
+                        )
                     }
                 }
             })
@@ -56,33 +71,42 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(viewModel())
+                    viewmodel = viewModel()
+                    MainScreen(viewmodel)
+                }
+            }
+        }
+
+        // keep screen awake
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                if (settingsDataDao.getSettingsData().preventSleepDuringConnection){
+                    Log.d("MainActivity", "keep screen on")
+                    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
             }
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         Log.d("MainActivity", "onDestroy")
+        if (!isChangingConfigurations) {
+            viewmodel.disconnect()
+        }
+
     }
-    override fun onStart() {
-        super.onStart()
-        Log.d("MainActivity", "onStart")
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        Log.d("MainActivity", "onSaveInstanceState")
+        viewmodel.saveState(outState)
     }
-    override fun onStop() {
-        super.onStop()
-        Log.d("MainActivity", "onStop")
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        Log.d("MainActivity", "onRestoreInstanceState")
+        viewmodel.restoreState(savedInstanceState)
     }
-    override fun onResume() {
-        super.onResume()
-        Log.d("MainActivity", "onResume")
-    }
-    override fun onPause() {
-        super.onPause()
-        Log.d("MainActivity", "onPause")
-    }
-    override fun onRestart() {
-        super.onRestart()
-        Log.d("MainActivity", "onRestart")
-    }
+
 }
