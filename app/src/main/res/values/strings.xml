@@ -17,4 +17,6 @@
     <string name="channel_max_client_reached">Channel max client reached</string>
     <string name="too_many_clones_already_connected">Too many clones already connected</string>
     <string name="problem_establishing_client_connection">Problem establishing client connection</string>
+    <string name="connected_to_server">Connected to server</string>
+    <string name="microphone_service">TeamSpeak is using your microphone...</string>
 </resources>

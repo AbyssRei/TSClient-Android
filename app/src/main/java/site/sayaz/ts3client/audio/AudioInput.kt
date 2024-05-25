@@ -9,27 +9,33 @@ import java.util.*
 class AudioInput : Microphone {
     // Microphone interface
     private val packetQueue: Queue<ByteArray> = LinkedList()
-    private var state = InputState.STOP
+    var state = InputState.STOP
     private val audioEncoder = AudioEncoder(48000, 1)
 
     fun start() {
         Log.d("AudioInput", "Starting audio input")
         state = InputState.START
     }
+
     fun write(buffer: ByteArray?) {
         audioEncoder.encode(buffer?: ByteArray(0)) {
             packetQueue.add(it)
         }
     }
 
+    fun clearQueue() {
+        packetQueue.clear()
+    }
+
+    /**
+     * 此接口在库中未实现
+     * 不是 哥们
+     */
     override fun isMuted(): Boolean {
-        if (state == InputState.MUTE) {
-            Log.d("AudioInput", "Microphone is muted.")
-            return true
-        }
         return false
     }
     override fun isReady(): Boolean {
+        //Log.d("AudioInput", "Microphone is ready.")
         return state != InputState.STOP
     }
 
@@ -38,17 +44,12 @@ class AudioInput : Microphone {
     }
 
     override fun provide(): ByteArray {
+        if (state == InputState.MUTE) {
+//            Log.d("AudioInput", "Muted.")
+            return ByteArray(0)
+        }
         return try {
-            if (packetQueue.peek() == null) {
-                Log.d("AudioInput", "No packets available.")
-                return ByteArray(0)
-            }
             val packet = packetQueue.remove()
-            if (packet == null){
-                Log.d("AudioInput", "Packet is null.")
-                return ByteArray(0)
-            }
-            // underflow
             //Log.d("AudioInput", "Providing packet.")
             packet
         } catch (ex: NoSuchElementException) {

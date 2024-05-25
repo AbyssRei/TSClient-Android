@@ -11,4 +11,8 @@ fun SettingsLayout(appViewModel: AppViewModel){
     val context = LocalContext.current
     /*TODO: SettingsLayout*/
 // TODO 在连接时保持唤醒
+    // TODO 主题 夜间模式
+    // TODO 语言
+
+
 }

@@ -9,8 +9,8 @@ import com.github.manevolent.ts3j.protocol.packet.PacketBody0Voice
 
 class AudioPlayer {
     private var audioTrack: AudioTrack
-    private var isPlaying = false
     private val audioDecoder = AudioDecoder(48000, 1)
+    private var outputState = OutputState.STOP
 
     init {
         val minBufferSize = AudioTrack.getMinBufferSize(
@@ -38,16 +38,21 @@ class AudioPlayer {
 
     fun start() {
         audioTrack.play()
-        isPlaying = true
+        outputState = OutputState.START
     }
-
+    fun deafen() {
+        outputState = OutputState.DEAFEN
+    }
+    fun undeafen() {
+        outputState = OutputState.START
+    }
     fun playPacket(voicePacket: PacketBody0Voice) {
             var audioData = voicePacket.codecData
             if (audioData == null) {
                 Log.d("AudioPlayer", "No audio data")
                 audioData = ByteArray(0)
             }
-
+            if (outputState == OutputState.DEAFEN) return
             audioDecoder.decode(audioData) {
                 audioTrack.write(it, 0, it.size)
             }
@@ -56,6 +61,11 @@ class AudioPlayer {
     fun stop() {
         audioTrack.stop()
         audioTrack.release()
-        isPlaying = false
+        outputState = OutputState.STOP
     }
+}
+enum class OutputState {
+    START,
+    STOP,
+    DEAFEN
 }

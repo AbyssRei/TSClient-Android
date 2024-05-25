@@ -33,8 +33,9 @@ class AudioService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
         val notification = Notification.Builder(this,channelID)
-            .setContentTitle("Microphone Service")
-            .setContentText("Microphone is running in the background...")
+            .setContentTitle(R.string.connected_to_server.toString())
+            .setContentText(R.string.microphone_service.toString())
+            .setShowWhen(true)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
             .setOngoing(true)

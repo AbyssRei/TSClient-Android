@@ -22,7 +22,16 @@ class AudioRecorder(val context: Context,private val audioInput: AudioInput) {
     private val channelConfig = AudioFormat.CHANNEL_IN_MONO
     private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
     private val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
-
+    fun mute() {
+        Log.d("AudioRecorder", "Muting")
+        if (audioInput.state == InputState.STOP) return
+        audioInput.state = InputState.MUTE
+    }
+    fun unmute() {
+        if (audioInput.state == InputState.STOP) return
+        audioInput.clearQueue()
+        audioInput.state = InputState.START
+    }
     fun start() {
         try {
             if (ActivityCompat.checkSelfPermission(

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import com.github.manevolent.ts3j.api.Channel
 import com.github.manevolent.ts3j.api.Client
+import com.github.manevolent.ts3j.api.ClientInfo
 import com.github.manevolent.ts3j.api.VirtualServerInfo
 import com.github.manevolent.ts3j.command.SingleCommand
 import com.github.manevolent.ts3j.event.TS3Listener
@@ -14,6 +15,8 @@ import com.github.manevolent.ts3j.protocol.socket.client.LocalTeamspeakClientSoc
 import site.sayaz.ts3client.audio.AudioPlayer
 import site.sayaz.ts3client.audio.AudioRecorder
 import site.sayaz.ts3client.audio.AudioService
+import site.sayaz.ts3client.ui.channel.ChannelData
+import site.sayaz.ts3client.ui.channel.toData
 import site.sayaz.ts3client.util.base64Sha1
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -34,10 +37,11 @@ class ClientSocket(
 
     val isConnected: Boolean
         get() = _client.isConnected
-
+    val id get() = _client.clientId
     @Throws(Exception::class)
     suspend fun connect(serverData: ServerData): LocalTeamspeakClientSocket {
         val identity: LocalIdentity = getIdentity()
+        Log.i("ClientSocket", "Connecting to ${serverData.hostname},hostname: ${serverData.hostname}, password: ${serverData.password}, nickname: ${serverData.nickname}")
 
         _client.setIdentity(identity)
         _client.addListener(listener)
@@ -101,9 +105,16 @@ class ClientSocket(
     }
 
 
+
+
     fun disconnect() {
         _client.disconnect("Bye~")
         audioRecorder.stop()
         audioPlayer.stop()
     }
+
+    fun getChannelData(channelID: Int) = _client.getChannelInfo(channelID).toData()
+    fun getClientData(clientID: Int) = _client.getClientInfo(clientID).toData()
+
+
 }

@@ -36,141 +36,249 @@ import com.github.manevolent.ts3j.event.UnknownTeamspeakEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import site.sayaz.ts3client.ui.AppViewModel
+import site.sayaz.ts3client.ui.channel.ChannelData
+import site.sayaz.ts3client.ui.channel.ChannelStateInterface
+import site.sayaz.ts3client.ui.channel.ClientData
 
-class Listener(private val updateChannel: () -> Unit, private val updateClient: () -> Unit) :
+class Listener(private val state : ChannelStateInterface) :
     TS3Listener {
+        //TODO to be deleted
+    private val debug = true
 
 
 
     override fun onTextMessage(e: TextMessageEvent?) {
+        if (debug) {
+            Log.d("Listener", "Text message")
+        }
         super.onTextMessage(e)
+
     }
 
     override fun onClientJoin(e: ClientJoinEvent?) {
+        if (debug) {
+            Log.d("Listener", "Client join")
+        }
         super.onClientJoin(e)
-        updateClient()
+        e?:return
+        state.addClient(ClientData(e.clientId, e.clientChannelGroupId,e.clientNickname))
     }
 
     override fun onClientLeave(e: ClientLeaveEvent?) {
+        if (debug) {
+            Log.d("Listener", "Client leave")
+        }
         super.onClientLeave(e)
-        updateClient()
+        e?:return
+        state.removeClient(e.clientId)
     }
 
     override fun onServerEdit(e: ServerEditedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Server edit")
+        }
+        //TODO
         super.onServerEdit(e)
     }
 
     override fun onChannelEdit(e: ChannelEditedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel edit")
+        }
         super.onChannelEdit(e)
-        updateChannel()
+        e?:return
+        state.updateChannel(e.channelId)
     }
 
     override fun onChannelDescriptionChanged(e: ChannelDescriptionEditedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel description changed")
+        }
         super.onChannelDescriptionChanged(e)
-        updateChannel()
+        //TODO
     }
 
     override fun onClientMoved(e: ClientMovedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Client moved")
+        }
         super.onClientMoved(e)
-        updateClient()
+        e?:return
+        state.moveClient(e.clientId, e.targetChannelId)
+
     }
 
     override fun onChannelCreate(e: ChannelCreateEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel create")
+        }
         super.onChannelCreate(e)
-        updateChannel()
+        e?:return
+        state.addChannel(e.channelId)
     }
 
     override fun onChannelDeleted(e: ChannelDeletedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel deleted")
+        }
         super.onChannelDeleted(e)
-        updateChannel()
+        e?:return
+        state.removeChannel(e.channelId)
     }
 
     override fun onChannelMoved(e: ChannelMovedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel moved")
+        }
         super.onChannelMoved(e)
-        updateChannel()
+        e?:return
+        state.moveChannel(e.channelId,e.channelOrder,e.channelParentId)
     }
 
     override fun onChannelPasswordChanged(e: ChannelPasswordChangedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel password changed")
+        }
         super.onChannelPasswordChanged(e)
-        updateChannel()
+        //TODO() updateChannel()
     }
 
     override fun onChannelList(e: ChannelListEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel list")
+        }
         super.onChannelList(e)
     }
 
     override fun onPrivilegeKeyUsed(e: PrivilegeKeyUsedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Privilege key used")
+        }
         super.onPrivilegeKeyUsed(e)
     }
 
     override fun onChannelGroupList(e: ChannelGroupListEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel group list")
+        }
         super.onChannelGroupList(e)
     }
 
     override fun onServerGroupList(e: ServerGroupListEvent?) {
+        if (debug) {
+            Log.d("Listener", "Server group list")
+        }
         super.onServerGroupList(e)
     }
 
     override fun onClientNeededPermissions(e: ClientNeededPermissionsEvent?) {
+        if (debug) {
+            Log.d("Listener", "Client needed permissions")
+        }
         super.onClientNeededPermissions(e)
     }
 
     override fun onClientChannelGroupChanged(e: ClientChannelGroupChangedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Client channel group changed")
+        }
         super.onClientChannelGroupChanged(e)
-        updateClient()
     }
 
     override fun onClientChanged(e: ClientUpdatedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Client changed")
+        }
         super.onClientChanged(e)
-        updateClient()
+        e?:return
+        state.changeClient(e.clientId)
+
     }
 
     override fun onDisconnected(e: DisconnectedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Disconnected")
+        }
         super.onDisconnected(e)
     }
 
     override fun onChannelSubscribed(e: ChannelSubscribedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel subscribed")
+        }
         super.onChannelSubscribed(e)
+
     }
 
     override fun onChannelUnsubscribed(e: ChannelUnsubscribedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel unsubscribed")
+        }
         super.onChannelUnsubscribed(e)
     }
 
     override fun onServerGroupClientAdded(e: ServerGroupClientAddedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Server group client added")
+        }
         super.onServerGroupClientAdded(e)
     }
 
     override fun onServerGroupClientDeleted(e: ServerGroupClientDeletedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Server group client deleted")
+        }
         super.onServerGroupClientDeleted(e)
     }
 
     override fun onClientPoke(e: ClientPokeEvent?) {
-        super.onClientPoke(e)
+        if (debug) {
+            Log.d("Listener", "Client poke")
+        }
+        super.onClientPoke(e)//TODO
     }
 
     override fun onClientComposing(e: ClientChatComposingEvent?) {
+        if (debug) {
+            Log.d("Listener", "Client composing")
+        }
         super.onClientComposing(e)
 
     }
 
     override fun onPermissionList(e: PermissionListEvent?) {
+        if (debug) {
+            Log.d("Listener", "Permission list")
+        }
         super.onPermissionList(e)
     }
 
     override fun onConnected(e: ConnectedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Connected")
+        }
         super.onConnected(e)
     }
 
     override fun onClientChatClosed(e: ClientChatClosedEvent?) {
+        if (debug) {
+            Log.d("Listener", "Client chat closed")
+        }
         super.onClientChatClosed(e)
     }
 
     override fun onClientPermHints(e: ClientPermHintsEvent?) {
+        if (debug) {
+            Log.d("Listener", "Client perm hints")
+        }
         super.onClientPermHints(e)
     }
 
     override fun onChannelPermHints(e: ChannelPermHintsEvent?) {
+        if (debug) {
+            Log.d("Listener", "Channel perm hints")
+        }
         super.onChannelPermHints(e)
     }
 

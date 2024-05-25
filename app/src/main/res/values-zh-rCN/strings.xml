@@ -17,4 +17,6 @@
     <string name="channel_max_client_reached">频道达到最大人数</string>
     <string name="too_many_clones_already_connected">重复连接过多</string>
     <string name="problem_establishing_client_connection">无法建立连接</string>
+    <string name="connected_to_server">已连接到服务器</string>
+    <string name="microphone_service">"TeamSpeak正在使用你的麦克风... "</string>
 </resources>
