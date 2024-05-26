@@ -116,7 +116,7 @@ fun MainScaffold(mainNavController: NavController, appViewModel: AppViewModel = 
                         .padding(paddingValues)
                         .fillMaxSize()
                 ) {
-                    SettingsLayout(appViewModel)
+                    SettingsLayout(appViewModel,mainNavController)
                 }
             }
         }

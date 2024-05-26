@@ -23,4 +23,20 @@
     <string name="no_audio_permission">无音频权限</string>
     <string name="about">关于</string>
     <string name="space">" "</string>
+    <string name="default_value">跟随系统</string>
+    <string name="system">跟随系统</string>
+    <string name="dark_mode">夜间模式</string>
+    <string name="theme">主题</string>
+    <string name="appearance">外观</string>
+    <string name="language">语言</string>
+    <string name="permission_denied_forever">权限被永久拒绝</string>
+    <string name="prevent_sleep">阻止休眠</string>
+    <string name="relink_to_apply">重新连接服务器以应用</string>
+    <string name="restart_app_to_apply">重启应用以应用</string>
+    <string name="apply">应用</string>
+    <string name="light">浅色</string>
+    <string name="dark">深色</string>
+    <string name="dynamic">动态</string>
+    <string name="apple">红苹果</string>
+    <string name="default_value_moren">默认</string>
 </resources>

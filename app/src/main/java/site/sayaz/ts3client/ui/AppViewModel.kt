@@ -6,8 +6,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.internal.wait
 import site.sayaz.ts3client.R
 import site.sayaz.ts3client.audio.AudioPlayer
 import site.sayaz.ts3client.audio.AudioRecorder
@@ -27,6 +31,7 @@ import site.sayaz.ts3client.client.ServerData
 import site.sayaz.ts3client.client.ServerDataDao
 import site.sayaz.ts3client.audio.AudioService
 import site.sayaz.ts3client.audio.AudioServiceConnection
+import site.sayaz.ts3client.main.MainActivity
 import site.sayaz.ts3client.settings.SettingsDataDao
 import site.sayaz.ts3client.ui.channel.AudioController
 import site.sayaz.ts3client.ui.channel.ChannelData
@@ -34,6 +39,7 @@ import site.sayaz.ts3client.ui.channel.ChannelStateInterface
 import site.sayaz.ts3client.ui.channel.ClientData
 import site.sayaz.ts3client.ui.channel.ClientState
 import site.sayaz.ts3client.ui.channel.toData
+import site.sayaz.ts3client.ui.navigation.MainRoute
 import site.sayaz.ts3client.ui.server.ConnectionState
 import site.sayaz.ts3client.ui.server.ServerConnectionState
 import site.sayaz.ts3client.ui.util.toast
@@ -60,7 +66,7 @@ class AppViewModel @Inject constructor(
             }
             field = checked
             viewModelScope.launch {
-                withContext(Dispatchers.IO){
+                withContext(Dispatchers.IO) {
                     settingsDataDao.setSettingsData(_uiState.value.settingsData)
                 }
             }
@@ -84,16 +90,18 @@ class AppViewModel @Inject constructor(
     init {
         Log.d("AppViewModel", "init viewmodel")
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.IO) {
                 // Load database
                 val serversFromDb = serverDataDao.getAll()
                 if (serversFromDb.isNotEmpty()) {
                     _uiState.value =
-                        AppState(servers = serversFromDb, serverConnectionStates = serversFromDb.map {
-                            ServerConnectionState(
-                                it.id, ConnectionState.NOT_CONNECTED
-                            )
-                        })
+                        AppState(
+                            servers = serversFromDb,
+                            serverConnectionStates = serversFromDb.map {
+                                ServerConnectionState(
+                                    it.id, ConnectionState.NOT_CONNECTED
+                                )
+                            })
                 }
 
                 val settingsData = settingsDataDao.getSettingsData()
@@ -510,4 +518,49 @@ class AppViewModel @Inject constructor(
         _uiState.value = savedInstanceState.getParcelable("appState")!!
     }
 
+    fun changeLanguage(language: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                _uiState.update {
+                    it.copy(
+                        settingsData = it.settingsData.copy(language = language)
+                    )
+                }
+                settingsDataDao.setSettingsData(
+                    _uiState.value.settingsData
+                )
+            }
+        }
+    }
+
+    fun changeAppearance(appearance: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                _uiState.update {
+                    it.copy(
+                        settingsData = it.settingsData.copy(appearance = appearance)
+                    )
+                }
+                settingsDataDao.setSettingsData(
+                    _uiState.value.settingsData
+                )
+
+            }
+        }
+    }
+
+    fun changeTheme(theme: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                _uiState.update {
+                    it.copy(
+                        settingsData = it.settingsData.copy(theme = theme)
+                    )
+                }
+                settingsDataDao.setSettingsData(
+                    _uiState.value.settingsData
+                )
+            }
+        }
+    }
 }

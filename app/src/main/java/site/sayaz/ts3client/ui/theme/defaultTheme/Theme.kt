@@ -1,10 +1,9 @@
-package site.sayaz.ts3client.ui.theme
+package site.sayaz.ts3client.ui.theme.defaultTheme
 
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -15,7 +14,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import site.sayaz.ts3client.ui.theme.Typography
 
 
 private val LightColors = lightColorScheme(
@@ -84,15 +82,17 @@ private val DarkColors = darkColorScheme(
 )
 
 @Composable
-fun TS3ClientTheme(
-  useDarkTheme: Boolean = isSystemInDarkTheme(),
-  content: @Composable() () -> Unit
+fun DefaultTheme(
+    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit,
+    useDynamicTheme: Boolean,
+    useSideEffect: Boolean = true
 ) {
     // 动态配色
     val context = LocalContext.current
     val view = LocalView.current
     val colors = when {
-        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) -> {
+        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && useDynamicTheme) -> {
             if (useDarkTheme) dynamicDarkColorScheme(context)
             else dynamicLightColorScheme(context)
         }
@@ -100,7 +100,7 @@ fun TS3ClientTheme(
         else -> LightColors
     }
     // 状态栏
-    if (!view.isInEditMode) {
+    if (!view.isInEditMode && useSideEffect) {
         SideEffect {
             val window = (view.context as Activity).window
             val color = colors.primary.toArgb()
@@ -113,7 +113,7 @@ fun TS3ClientTheme(
 
   MaterialTheme(
     colorScheme = colors,
-    typography = Typography,
+    typography = site.sayaz.ts3client.ui.theme.Typography,
     content = content
   )
 }

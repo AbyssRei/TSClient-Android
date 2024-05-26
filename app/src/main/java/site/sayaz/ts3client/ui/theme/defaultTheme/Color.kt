@@ -1,4 +1,4 @@
-package site.sayaz.ts3client.ui.theme
+package site.sayaz.ts3client.ui.theme.defaultTheme
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF6750A4)

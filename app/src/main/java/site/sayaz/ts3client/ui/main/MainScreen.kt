@@ -6,16 +6,16 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import site.sayaz.ts3client.ui.AppViewModel
 import site.sayaz.ts3client.ui.navigation.MainRoute
 import site.sayaz.ts3client.ui.server.AddServerScreen
-import site.sayaz.ts3client.ui.util.ErrorNotifier
+import site.sayaz.ts3client.ui.settings.AboutScreen
+import site.sayaz.ts3client.ui.settings.AppearanceScreen
+import site.sayaz.ts3client.ui.settings.LanguageScreen
 
 @Composable
 fun MainScreen(
@@ -35,6 +35,15 @@ fun MainScreen(
         composable(MainRoute.ADD_SERVER.name) {
             Log.d("MainScreen", MainRoute.ADD_SERVER.name)
             AddServerScreen(mainNavController, appViewModel)
+        }
+        composable(MainRoute.SETTINGS_LANGUAGE.name) {
+            LanguageScreen(mainNavController, appViewModel)
+        }
+        composable(MainRoute.SETTINGS_APPEARANCE.name) {
+            AppearanceScreen(mainNavController, appViewModel)
+        }
+        composable(MainRoute.SETTINGS_ABOUT.name) {
+            AboutScreen(mainNavController, appViewModel)
         }
     }
 

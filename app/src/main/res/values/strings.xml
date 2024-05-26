@@ -21,7 +21,7 @@
     <string name="disconnect">Disconnect</string>
     <string name="no_audio_permission">No audio permission</string>
     <string name="about">About</string>
-    <string name="settings">" Settings"</string>
+    <string name="settings">Settings</string>
     <string name="space"></string>
     <string name="dark_mode">Dark Mode</string>
     <string name="theme">Theme</string>
@@ -31,4 +31,12 @@
     <string name="prevent_sleep">Prevent Sleep</string>
     <string name="relink_to_apply">Relink to apply</string>
     <string name="restart_app_to_apply">Restart app to apply</string>
+    <string name="apply">Apply</string>
+    <string name="default_value">Default</string>
+    <string name="system">System</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="dynamic">Dynamic</string>
+    <string name="apple">Red apple</string>
+    <string name="default_value_moren">Default</string>
 </resources>

@@ -8,8 +8,8 @@ object SettingsDBCallback : RoomDatabase.Callback(){
         // init settings
         super.onCreate(db)
         db.execSQL("""
-            INSERT INTO SettingsData (preventSleepDuringConnection) 
-            VALUES (0)
+            INSERT INTO SettingsData (preventSleepDuringConnection, language,appearance,theme) 
+            VALUES (0,'def','system','def')
         """)
     }
 }

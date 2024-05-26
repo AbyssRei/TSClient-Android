@@ -13,13 +13,20 @@ import kotlinx.parcelize.Parcelize
 data class SettingsData (
     @PrimaryKey(autoGenerate = true) val id : Int = 1,
     val preventSleepDuringConnection : Boolean = false,
+    //def,en,zh
+    val language : String = "zh",
+    // darkMode:system dark light
+    val appearance : String = "system",
+    // def,dynamic,apple
+    val theme : String = "def"
 ) : Parcelable
 
 @Dao
 interface SettingsDataDao {
     @Query("SELECT * FROM settingsdata")
-    fun getSettingsData() : SettingsData
+    suspend fun getSettingsData() : SettingsData
 
     @Update
-    fun setSettingsData(settingsData: SettingsData)
+    suspend fun setSettingsData(settingsData: SettingsData)
+
 }

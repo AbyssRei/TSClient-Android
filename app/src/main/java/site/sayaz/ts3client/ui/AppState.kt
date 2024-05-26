@@ -10,6 +10,7 @@ import site.sayaz.ts3client.settings.SettingsData
 import site.sayaz.ts3client.ui.channel.ChannelData
 import site.sayaz.ts3client.ui.channel.ClientData
 import site.sayaz.ts3client.ui.server.ServerConnectionState
+import site.sayaz.ts3client.ui.theme.DarkThemeEnum
 
 @Parcelize
 data class AppState (

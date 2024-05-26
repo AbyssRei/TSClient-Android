@@ -1,40 +1,37 @@
 package site.sayaz.ts3client.main
 
-import android.content.Context
+
+
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.Room
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import site.sayaz.ts3client.R
-import site.sayaz.ts3client.db.AppDB
 import site.sayaz.ts3client.settings.SettingsDataDao
 import site.sayaz.ts3client.ui.AppViewModel
 import site.sayaz.ts3client.ui.main.MainScreen
-import site.sayaz.ts3client.ui.theme.TS3ClientTheme
+import site.sayaz.ts3client.ui.theme.CustomTheme
 import site.sayaz.ts3client.ui.util.toast
+import java.util.Locale
 import javax.inject.Inject
-import javax.inject.Singleton
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -46,7 +43,6 @@ class MainActivity : ComponentActivity() {
         Log.d("MainActivity", "onCreate")
         XXPermissions.with(this)
             .permission(Permission.RECORD_AUDIO)
-            .permission(Permission.NOTIFICATION_SERVICE)
             .request(object : OnPermissionCallback {
                 override fun onGranted(permissions: MutableList<String>, allGranted: Boolean) {}
                 override fun onDenied(permissions: MutableList<String>, doNotAskAgain: Boolean) {
@@ -64,10 +60,27 @@ class MainActivity : ComponentActivity() {
                 }
             })
 
+        if (savedInstanceState != null) {
+            viewmodel.restoreState(savedInstanceState)
+        }
+        // read settings
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                initSettings()
+            }
+        }
 
         setContent {
-            TS3ClientTheme {
-                // A surface container using the 'background' color from the theme
+            val appState by viewmodel.uiState.collectAsState()
+            val useDarkTheme = when (appState.settingsData.appearance) {
+                "dark" -> true
+                "light" -> false
+                else -> isSystemInDarkTheme()
+            }
+            CustomTheme(
+                useDarkTheme = useDarkTheme,
+                theme = appState.settingsData.theme
+            ) {
                 Surface(
                     color = MaterialTheme.colorScheme.background
                 ) {
@@ -76,16 +89,40 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
 
-        // keep screen awake
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                if (settingsDataDao.getSettingsData().preventSleepDuringConnection){
-                    Log.d("MainActivity", "keep screen on")
-                    window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                }
+    private suspend fun initSettings() {
+        val settingsData = settingsDataDao.getSettingsData()
+        //sleep
+        if (settingsData.preventSleepDuringConnection) {
+            Log.d("MainActivity", "keep screen on")
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+        //language
+        val resources: Resources = this@MainActivity.resources
+        val dm = resources.displayMetrics
+        val config = resources.configuration
+        when (settingsData.language) {
+            "zh" -> {
+                Log.d("MainActivity", "set language to Chinese")
+                config.locale = Locale("zh")
+            }
+
+            "en" -> {
+                Log.d("MainActivity", "set language to English")
+                config.locale = Locale("en")
+            }
+
+            else -> {
+                Log.d("MainActivity", "set language to default")
+                config.locale = Locale.getDefault()
             }
         }
+        resources.updateConfiguration(config, dm)
+        //appearance
+
+        //theme
+
     }
 
     override fun onDestroy() {
