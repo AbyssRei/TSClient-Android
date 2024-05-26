@@ -1,3 +1,10 @@
+import com.github.jk1.license.render.ReportRenderer
+import com.github.jk1.license.render.InventoryHtmlReportRenderer
+import com.github.jk1.license.filter.DependencyFilter
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.github.jk1.license.render.CsvReportRenderer
+import com.github.jk1.license.render.SimpleHtmlReportRenderer
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -5,8 +12,17 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
-}
+    id("com.github.jk1.dependency-license-report") version "2.6"
 
+
+}
+licenseReport {
+    outputDir = "$projectDir/build/licenses"
+    projects = arrayOf(project) + project.subprojects
+    configurations = arrayOf("releaseRuntimeClasspath")
+    renderers = arrayOf<ReportRenderer>(SimpleHtmlReportRenderer())
+    filters = arrayOf<DependencyFilter>(LicenseBundleNormalizer())
+}
 android {
     namespace = "site.sayaz.ts3client"
     compileSdk = 34
@@ -49,6 +65,13 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    sourceSets {
+        getByName("main") {
+            assets {
+                srcDirs("src/main/assets")
+            }
         }
     }
 }
@@ -103,6 +126,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-android
     runtimeOnly(libs.kotlinx.coroutines.android)
 
+    implementation("org.jsoup:jsoup:1.14.3")
 
 }
 kapt {

@@ -2,6 +2,8 @@ package site.sayaz.ts3client.ui.channel
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.VolumeOff
@@ -38,30 +40,42 @@ fun ClientStateIcon(state: ClientState){
         ClientState.TALKING -> Icon(
             Icons.Outlined.Mic,
             contentDescription = "Talking",
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(4.dp)
         )
 
         ClientState.SILENT -> Icon(
             Icons.Outlined.MicNone,
             contentDescription = "Silent",
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(4.dp)
         )
 
         ClientState.MUTED -> Icon(
             Icons.Outlined.MicOff,
             contentDescription = "Muted",
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(4.dp)
         )
 
         ClientState.DEAFENED -> Icon(
             Icons.AutoMirrored.Outlined.VolumeOff,
             contentDescription = "Deafened",
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(4.dp)
         )
 
         ClientState.AWAY -> Icon(
             Icons.Outlined.CancelPresentation,
             contentDescription = "Away",
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(4.dp)
         )
         else -> Icon(
             Icons.Outlined.QuestionMark,
-            contentDescription = "Silent"
+            contentDescription = "Silent",
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(4.dp)
         )
     }
 }

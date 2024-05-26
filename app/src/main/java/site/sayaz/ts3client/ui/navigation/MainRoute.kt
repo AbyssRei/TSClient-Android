@@ -6,4 +6,5 @@ enum class MainRoute(value : String) {
     SETTINGS_LANGUAGE("settings_language"),
     SETTINGS_APPEARANCE("settings_appearance"),
     SETTINGS_ABOUT("settings_about"),
+    ABOUT_OPENSOURCE("opensource"),
 }

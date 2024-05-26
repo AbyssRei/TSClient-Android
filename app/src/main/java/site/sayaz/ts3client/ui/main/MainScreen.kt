@@ -16,6 +16,7 @@ import site.sayaz.ts3client.ui.server.AddServerScreen
 import site.sayaz.ts3client.ui.settings.AboutScreen
 import site.sayaz.ts3client.ui.settings.AppearanceScreen
 import site.sayaz.ts3client.ui.settings.LanguageScreen
+import site.sayaz.ts3client.ui.settings.OpenSourceLicenceScreen
 
 @Composable
 fun MainScreen(
@@ -44,6 +45,9 @@ fun MainScreen(
         }
         composable(MainRoute.SETTINGS_ABOUT.name) {
             AboutScreen(mainNavController, appViewModel)
+        }
+        composable(MainRoute.ABOUT_OPENSOURCE.name) {
+            OpenSourceLicenceScreen(mainNavController, appViewModel)
         }
     }
 

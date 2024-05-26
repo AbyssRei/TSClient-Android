@@ -39,4 +39,6 @@
     <string name="dynamic">Dynamic</string>
     <string name="apple">Red apple</string>
     <string name="default_value_moren">Default</string>
+    <string name="version">Version</string>
+    <string name="open_source_licences">Open Source Licences</string>
 </resources>

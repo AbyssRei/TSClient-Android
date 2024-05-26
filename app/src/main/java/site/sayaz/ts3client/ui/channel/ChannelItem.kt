@@ -7,12 +7,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.outlined.Lyrics
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,88 +56,103 @@ fun ChannelItem(channel: ChannelData, client: List<ClientData>, switchChannel: (
         val channelModifier = Modifier
             .height(lineHeight)
             .fillMaxWidth()
-        if (matchResult != null) {
-            // Spacer
-            val textAlign = when (alignment) {
-                "l" -> TextAlign.Start
-                "c" -> TextAlign.Center
-                "r" -> TextAlign.End
-                else -> TextAlign.Start
-            }
-            if (alignment!!.startsWith("*")) text = text!!.repeat(100)
-            if (text!!.toString() == "---") text = "-".repeat(100)
-            FoldList(expandedState = expandedState, title = {
-                when (text.toString()) {
-                    "..." -> DotDivider(
-                        color = Color.Black,
-                        modifier = channelModifier
-                    )
-
-                    "-.-" -> DottedLineDivider(
-                        color = Color.Black,
-                        modifier = channelModifier
-                    )
-                    "___" -> HorizontalDivider(
-                        color = Color.Black,
-                        modifier = channelModifier
-                    )
-                    "-.." -> DoubleDottedLineDivider(
-                        color = Color.Black,
-                        modifier = channelModifier
-                    )
-
-                    else -> {
-                        Text(
-                            text = text.toString(),
-                            textAlign = textAlign,
-                            modifier = channelModifier,
-                            maxLines = 1
+        Box(Modifier.padding(8.dp)) {
+            if (matchResult != null) {
+                // Spacer
+                val textAlign = when (alignment) {
+                    "l" -> TextAlign.Start
+                    "c" -> TextAlign.Center
+                    "r" -> TextAlign.End
+                    else -> TextAlign.Start
+                }
+                if (alignment!!.startsWith("*")) text = text!!.repeat(100)
+                if (text!!.toString() == "---") text = "-".repeat(100)
+                FoldList(expandedState = expandedState, title = {
+                    when (text.toString()) {
+                        "..." -> DotDivider(
+                            color = Color.Black,
+                            modifier = channelModifier
                         )
-                    }
-                }
-            }, listItems = {
-                Column {
-                    client.forEach {
-                        ClientItem(it)
-                    }
-                }
-            })
-        } else {
-            // Normal
-            FoldList(
-                expandedState = expandedState,
-                title = {Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = channel.name,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.height(lineHeight)
-                    )
-                    IconButton(onClick = { expandedState.value = !expandedState.value }) {
-                        if (expandedState.value)
-                            Icon(
-                                Icons.Default.ExpandMore,
-                                "Collapse"
+
+                        "-.-" -> DottedLineDivider(
+                            color = Color.Black,
+                            modifier = channelModifier
+                        )
+
+                        "___" -> HorizontalDivider(
+                            color = Color.Black,
+                            modifier = channelModifier
+                        )
+
+                        "-.." -> DoubleDottedLineDivider(
+                            color = Color.Black,
+                            modifier = channelModifier
+                        )
+
+                        else -> {
+                            Text(
+                                text = text.toString(),
+                                textAlign = textAlign,
+                                modifier = channelModifier,
+                                maxLines = 1
                             )
-                        else Icon(Icons.Default.ExpandLess,
-                            "Expand"
-                        )
+                        }
                     }
-                }
-                },
-                listItems = {
+                }, listItems = {
                     Column {
                         client.forEach {
                             ClientItem(it)
                         }
                     }
-
                 })
+            } else {
+                // Normal
+                FoldList(
+                    expandedState = expandedState,
+                    title = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row {
+                                Icon(
+                                    Icons.Outlined.Lyrics,
+                                    "Channel",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = channel.name,
+                                    maxLines = 1,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.height(lineHeight)
+                                )
+                            }
+                            IconButton(onClick = { expandedState.value = !expandedState.value }) {
+                                if (expandedState.value)
+                                    Icon(
+                                        Icons.Default.ExpandMore,
+                                        "Collapse"
+                                    )
+                                else Icon(
+                                    Icons.Default.ExpandLess,
+                                    "Expand"
+                                )
+                            }
+                        }
+                    },
+                    listItems = {
+                        Column {
+                            client.forEach {
+                                ClientItem(it)
+                            }
+                        }
+
+                    })
+            }
         }
+
     }
 
 }
